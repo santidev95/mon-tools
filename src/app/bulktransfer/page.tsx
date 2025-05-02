@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useBulkErc20Transfer } from "@/lib/useBulkErc20Transfer";
+import { useBulkTransferWithApprove } from "@/lib/useBulkTransferWithApprove";
 import { useTokenBalances } from "@/lib/useTokenBalances";
+import toast from "react-hot-toast";
 
 const tokenList = [
-  "0x760AfE86e5de5fa0Ee542fc7B7B713e1c5425701", 
+  "0x760AfE86e5de5fa0Ee542fc7B7B713e1c5425701",
   "0xaEef2f6B429Cb59C9B2D7bB2141ADa993E8571c3",
   "0x3a98250F98Dd388C211206983453837C8365BDc1",
   "0xe1d2439b75fb9746E7Bc6cB777Ae10AA7f7ef9c5",
@@ -14,49 +15,75 @@ const tokenList = [
   "0x88b8E2161DEDC77EF4ab7585569D2415a1C1055D",
   "0xB5a30b0FDc5EA94A52fDc42e3E9760Cb8449Fb37",
   "0xA296f47E8Ff895Ed7A092b4a9498bb13C46ac768",
-  "0x0C0c92FcF37Ae2CBCc512e59714Cd3a1A1cbc411"
+  "0x0C0c92FcF37Ae2CBCc512e59714Cd3a1A1cbc411",
 ] as `0x${string}`[];
 
 export default function BulkTransferPage() {
-  const [tokenAddress, setTokenAddress] = useState<`0x${string}` | "native" | "">("");
+  const [tokenAddress, setTokenAddress] = useState<"" | `0x${string}` | "native">("");
   const [decimals, setDecimals] = useState<number>(18);
-  const [input, setInput] = useState(""); // lista de endereços
-  const [amount, setAmount] = useState(""); // valor único
+  const [input, setInput] = useState("");
+  const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("");
 
-  const { sendTransfers } = useBulkErc20Transfer();
+  const { execute } = useBulkTransferWithApprove();
   const { tokens, loading: tokensLoading } = useTokenBalances(tokenList);
 
-  const parseInput = () =>
+  const parseRecipients = () =>
     input
       .split("\n")
       .map((line) => line.trim())
-      .filter(Boolean)
-      .map((to) => ({ to, amount }));
+      .filter(Boolean);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setStatus("");
-    setLoading(true);
 
-    try {
-      const transfers = parseInput();
-      if (!tokenAddress) throw new Error("Select a token first.");
-      if (!amount || isNaN(Number(amount))) throw new Error("Invalid amount.");
-
-      await sendTransfers(tokenAddress, decimals, transfers);
-      setStatus("✅ Transfers completed successfully.");
-    } catch (err) {
-      console.error(err);
-      setStatus("❌ Error during transfer.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
+      const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setStatus("");
+        setLoading(true);
+      
+        const recipients = parseRecipients();
+      
+        if (!tokenAddress) {
+          toast.error("Select a token first.");
+          return;
+        }
+      
+        if (!amount || isNaN(Number(amount))) {
+          toast.error("Invalid amount.");
+          return;
+        }
+      
+        const txPromise = execute(tokenAddress, decimals, recipients, amount);
+      
+        toast.promise(txPromise, {
+          loading: "Processing transfer...",
+          success: (txResult) => {
+            if (Array.isArray(txResult)) {
+              return `✅ ${txResult.length} txns sent.`;
+            }
+            if (typeof txResult === "string") {
+              return (
+                <span>
+                  Transfer success:{"txResult"}
+                  <a
+                    href={`https://monadscan.dev/tx/${txResult}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline text-blue-300"
+                  >
+                    View TX
+                  </a>
+                </span>
+              );
+            }
+            return "Transfers completed!";
+          },
+          error: (err) => `❌ ${err?.message || "Error during transfer."}`,
+        }).finally(() => setLoading(false));
+      };
+      
   const totalToSend = () => {
-    const count = input.split("\n").filter(Boolean).length;
+    const count = parseRecipients().length;
     const total = parseFloat(amount || "0") * count;
     return `${total || 0}`;
   };
@@ -66,26 +93,32 @@ export default function BulkTransferPage() {
       <h1 className="text-xl font-bold text-purple-400 mb-4">Bulk Transfer Tool</h1>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-
         <label className="text-sm text-gray-400">Select token</label>
         <select
-          disabled={tokensLoading}
-          value={tokenAddress}
-          onChange={(e) => {
-            const selected = tokens.find(t => t.address === e.target.value);
-            if (selected) {
-              setTokenAddress(selected.address);
-              setDecimals(selected.decimals);
-            }
-          }}
-          className="px-4 py-2 rounded bg-zinc-900 border border-zinc-700 text-sm text-white"
-        >
-          <option value="">-- Select a token --</option>
-          {tokens.map((t) => (
-            <option key={t.address} value={t.address}>
-              {t.symbol} – {t.formattedBalance}
+            disabled={tokensLoading || loading}
+            value={tokenAddress}
+            onChange={(e) => {
+                const value = e.target.value;
+                const selected = tokens.find(t => t.address === value);
+
+                if (selected) {
+                setTokenAddress(selected.address); // "native" ou `0x${string}`
+                setDecimals(selected.decimals);
+                } else {
+                setTokenAddress("");
+                }
+            }}
+            className="px-4 py-2 rounded bg-zinc-900 border border-zinc-700 text-sm text-white"
+            >
+            <option value="">
+                {tokensLoading ? "Loading tokens..." : "-- Select a token --"}
             </option>
-          ))}
+            {!tokensLoading &&
+                tokens.map((t) => (
+                <option key={t.address} value={t.address}>
+                    {t.symbol} – {t.formattedBalance}
+                </option>
+                ))}
         </select>
 
         <label className="text-sm text-gray-400">Amount to send (same for all)</label>
@@ -117,7 +150,7 @@ export default function BulkTransferPage() {
           disabled={!tokenAddress || loading}
           className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded transition"
         >
-          {loading ? "Sending..." : "Send Transfers"}
+          {loading ? "Approving & Sending..." : "Approve & Transfer"}
         </button>
       </form>
 

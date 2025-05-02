@@ -4,6 +4,7 @@ import "./globals.css";
 import { headers } from "next/headers";
 import ContextProvider from "@/context";
 import Navbar from "@/components/Navbar";
+import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,6 +40,7 @@ export default async function RootLayout({
           <main>
             {children}
           </main>
+          <Toaster position="bottom-right" />
           <footer className="w-full text-center text-sm py-2 absolute bottom-0">
           <span className="text-violet-400 font-mono">
             <a href="https://x.com/gabriell_santi" target="_blank" rel="noopener noreferrer">
