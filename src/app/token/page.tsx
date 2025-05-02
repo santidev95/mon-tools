@@ -6,8 +6,13 @@ export default function HomePage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         <ToolCard
           title="Token Inspector"
-          description="View details of any Monad ERC20 token or NFT"
-          href="/token/"
+          description="View details of any Monad ERC20 token"
+          href="/token/erc20"
+        />
+        <ToolCard
+          title="NFT Inspector"
+          description="View details of any Monad NFT"
+          href="/token/nft"
         />
       </div>
     </main>

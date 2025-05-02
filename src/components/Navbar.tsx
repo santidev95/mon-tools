@@ -13,8 +13,8 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Logo compacta + nome (opcional) */}
         <div className="flex items-center gap-2">
-            <Image src="/logo.png" alt="Logo" width={70} height={70} />
-            <span className="text-base font-bold text-purple-400 font-mono">
+            <Image src="/logo.png" alt="Logo" width={65} height={65} />
+            <span className="text-base font-bold text-violet-400 font-mono">
                 Monadic Tools
             </span>
         </div>

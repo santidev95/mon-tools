@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    domains: ["img.reservoir.tools"],
+  }
 };
 
 export default nextConfig;
