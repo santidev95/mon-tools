@@ -5,7 +5,6 @@ import {
   getContract,
   formatUnits,
   http,
-  type Address,
 } from "viem";
 import { monadTestnet } from "viem/chains";
 
@@ -15,16 +14,13 @@ const publicClient = createPublicClient({
 });
 
 const ERC20_ABI = [
-  { name: "name", type: "function", stateMutability: "view", inputs: [], outputs: [{ type: "string" }] },
-  { name: "symbol", type: "function", stateMutability: "view", inputs: [], outputs: [{ type: "string" }] },
-  { name: "decimals", type: "function", stateMutability: "view", inputs: [], outputs: [{ type: "uint8" }] },
   {
     name: "balanceOf",
     type: "function",
     stateMutability: "view",
     inputs: [{ name: "account", type: "address" }],
-    outputs: [{ type: "uint256" }]
-  }
+    outputs: [{ type: "uint256" }],
+  },
 ];
 
 export interface TokenBalance {
@@ -49,7 +45,6 @@ export function useTokenBalances(tokenContracts: `0x${string}`[]) {
       setLoading(true);
       const result: TokenBalance[] = [];
 
-      // 1. Native MON
       try {
         const monBalance = await publicClient.getBalance({ address });
         if (monBalance > 0n) {
@@ -65,7 +60,6 @@ export function useTokenBalances(tokenContracts: `0x${string}`[]) {
         console.warn("Error reading MON balance:", err);
       }
 
-      // 2. ERC-20 tokens
       for (const tokenAddress of tokenContracts) {
         try {
           const contract = getContract({
@@ -74,24 +68,23 @@ export function useTokenBalances(tokenContracts: `0x${string}`[]) {
             client: publicClient,
           });
 
-          const [name, symbol, decimals, rawBalance] = await Promise.all([
-            contract.read.name() as Promise<string>,
-            contract.read.symbol() as Promise<string>,
-            contract.read.decimals() as Promise<number>,
-            contract.read.balanceOf([address]) as Promise<bigint>,
-          ]);
+          const balance = await contract.read.balanceOf([address]) as bigint;
+          if (balance === 0n) continue;
 
-          if (rawBalance > 0n) {
-            result.push({
-              address: tokenAddress,
-              name,
-              symbol,
-              decimals,
-              formattedBalance: formatUnits(rawBalance, decimals),
-            });
-          }
+          const res = await fetch(`/api/token-meta/${tokenAddress}`);
+          if (!res.ok) throw new Error("Failed to fetch metadata");
+
+          const { name, symbol, decimals } = await res.json();
+
+          result.push({
+            address: tokenAddress,
+            name,
+            symbol,
+            decimals,
+            formattedBalance: formatUnits(balance, decimals),
+          });
         } catch (err) {
-          console.warn(`Error reading token ${tokenAddress}:`, err);
+          console.warn(`Error loading metadata for ${tokenAddress}:`, err);
         }
       }
 
