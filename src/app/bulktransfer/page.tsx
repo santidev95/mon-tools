@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useBulkTransferWithApprove } from "@/lib/useBulkTransferWithApprove";
 import { useTokenBalances } from "@/lib/useTokenBalances";
 import toast from "react-hot-toast";
+import { useAccount } from "wagmi";
 
 const tokenList = [
   "0x760AfE86e5de5fa0Ee542fc7B7B713e1c5425701",
@@ -28,6 +29,7 @@ export default function BulkTransferPage() {
 
   const { execute } = useBulkTransferWithApprove();
   const { tokens, loading: tokensLoading } = useTokenBalances(tokenList);
+  const { isConnected } = useAccount();
 
   const parseRecipients = () =>
     input
@@ -146,11 +148,19 @@ export default function BulkTransferPage() {
         )}
 
         <button
-          type="submit"
-          disabled={!tokenAddress || loading}
-          className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded transition"
+        type="submit"
+        disabled={loading}
+        onClick={(e) => {
+            if (!isConnected) {
+            e.preventDefault();
+            toast.error("Please connect your wallet to continue.");
+            return;
+            }
+            // se estiver conectado, continue normalmente com o submit
+        }}
+        className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded transition"
         >
-          {loading ? "Approving & Sending..." : "Approve & Transfer"}
+        {loading ? "Approving & Sending..." : "Approve & Transfer"}
         </button>
       </form>
 
