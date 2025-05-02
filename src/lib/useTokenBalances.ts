@@ -71,7 +71,9 @@ export function useTokenBalances(tokenContracts: `0x${string}`[]) {
           const balance = await contract.read.balanceOf([address]) as bigint;
           if (balance === 0n) continue;
 
+          console.log("tokenAddress",tokenAddress);
           const res = await fetch(`/api/token-meta/${tokenAddress}`);
+          console.log("red",res);
           if (!res.ok) throw new Error("Failed to fetch metadata");
 
           const { name, symbol, decimals } = await res.json();

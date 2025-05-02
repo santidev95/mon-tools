@@ -22,9 +22,10 @@ function validateAddress(input: string): `0x${string}` | null {
 
 export async function GET(
   req: NextRequest,
-  context: { params: { address: string } }
+  context: any
 ) {
-  const token = validateAddress(context.params.address);
+  const address = context?.params?.address;
+  const token = validateAddress(address);
   if (!token) {
     return new NextResponse("Invalid address format", { status: 400 });
   }
