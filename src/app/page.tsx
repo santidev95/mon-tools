@@ -16,7 +16,7 @@ export default function HomePage() {
         />
         <ToolCard
           title="Token Bulk Transfer"
-          description="Send multiple tokens to multiple wallets"
+          description="Send a token amount to multiple wallets"
           href="/bulktransfer/"
         />
       </div>
