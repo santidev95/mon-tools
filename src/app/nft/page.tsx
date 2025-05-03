@@ -20,23 +20,23 @@ export default function CollectionInspectorPage() {
     setError("");
     setIsHolder(false);
     setLoading(true);
-
+  
     try {
-      const result = await fetchMagicEdenCollection(contract as `0x${string}`);
-      if (!result) {
-        setError("Collection not found or invalid contract.");
-        return;
-      }
-
+      const res = await fetch(`/api/magiceden/collection/${contract}`);
+      if (!res.ok) throw new Error("Collection not found");
+      const result = await res.json();
       setCollection(result);
-
+  
       if (address) {
-        const userData = await fetchUserCollectionByContract(address, contract);
-        if (userData && parseInt(userData.ownership.tokenCount) > 0) {
-          setIsHolder(true);
+        const userRes = await fetch(`/api/magiceden/user-collection/${address}/${contract}`);
+        if (userRes.ok) {
+          const userData = await userRes.json();
+          if (parseInt(userData.ownership.tokenCount) > 0) {
+            setIsHolder(true);
+          }
         }
       }
-    } catch {
+    } catch (err) {
       setError("Failed to fetch collection.");
     } finally {
       setLoading(false);
