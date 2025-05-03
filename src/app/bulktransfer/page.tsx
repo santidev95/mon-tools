@@ -93,7 +93,6 @@ export default function BulkTransferPage() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-10">
       <h1 className="text-xl font-bold text-purple-400 mb-4">Bulk Transfer Tool</h1>
-
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <label className="text-sm text-gray-400">Select token</label>
         <select
@@ -163,6 +162,8 @@ export default function BulkTransferPage() {
         {loading ? "Approving & Sending..." : "Approve & Transfer"}
         </button>
       </form>
+        <br></br>
+      <label className="text-sm text-gray-400">Bulk Transfer Contract: 0x73Fc1b28F405df9B4B97960F1A0C64C656708524</label>
 
       {status && <p className="mt-4 text-sm text-center">{status}</p>}
     </div>
