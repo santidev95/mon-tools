@@ -24,8 +24,16 @@ export default function CollectionInspectorPage() {
     try {
       const res = await fetch(`/api/magiceden/collection/${contract}`);
       if (!res.ok) throw new Error("Collection not found");
+  
       const result = await res.json();
-      setCollection(result);
+      const collectionData = result.collections?.[0];
+  
+      if (!collectionData) {
+        setError("Collection not found or empty.");
+        return;
+      }
+  
+      setCollection(collectionData);
   
       if (address) {
         const userRes = await fetch(`/api/magiceden/user-collection/${address}/${contract}`);
@@ -36,7 +44,7 @@ export default function CollectionInspectorPage() {
           }
         }
       }
-    } catch (err) {
+    } catch {
       setError("Failed to fetch collection.");
     } finally {
       setLoading(false);

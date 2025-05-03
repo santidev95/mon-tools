@@ -6,8 +6,9 @@ export async function GET(
   req: NextRequest,
   context: any
 ) {
-  const contract  = context?.params?.contract;
-  const wallet  = context?.params?.wallet;
+  const { params } = context;
+  const contract  = (await params).contract;
+  const wallet  = (await params).wallet;
 
   const url = `https://api-mainnet.magiceden.dev/v3/rtp/monad-testnet/users/${wallet}/collections/v3?collection=${contract}`;
 

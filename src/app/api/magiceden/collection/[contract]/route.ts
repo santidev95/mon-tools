@@ -6,7 +6,9 @@ export async function GET(
   req: NextRequest,
   context: any
 ) {
-  const contract  = context?.params?.contract;
+  const { params } = context;
+  const contract  = (await params).contract;
+  console.log("contract",contract);
   const url = `https://api-mainnet.magiceden.dev/v3/rtp/monad-testnet/collections/v7?contract=${contract}&includeMintStages=true&includeSecurityConfigs=true`;
 
   try {
