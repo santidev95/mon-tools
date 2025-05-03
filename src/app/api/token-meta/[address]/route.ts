@@ -60,7 +60,7 @@ export async function GET(
     const meta = { symbol, name, decimals };
 
     await redis.set(cacheKey, JSON.stringify(meta), {
-      EX: 60 * 60 * 24 * 7, // 7 dias
+      EX: 60 * 60 * 24 * 7,
     });
 
     await redis.quit();

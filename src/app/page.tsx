@@ -7,17 +7,22 @@ export default function HomePage() {
       <ToolCard
           title="ERC-20 tool"
           description="Inspect a ERC-20 token details"
-          href="/erc20/"
+          href="/erc20"
         />
         <ToolCard
           title="NFT Inspector"
           description="Details of any NFT collection"
-          href="/nft/"
+          href="/nft"
         />
         <ToolCard
           title="Token Bulk Transfer"
           description="Send a token amount to multiple wallets"
-          href="/bulktransfer/"
+          href="/bulktransfer"
+        />
+        <ToolCard
+          title="Wallet Profile"
+          description="See your wallet details"
+          href="/wallet"
         />
       </div>
     </main>
