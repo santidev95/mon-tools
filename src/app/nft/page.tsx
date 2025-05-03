@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useAccount } from "wagmi";
 import CollectionCard from "@/components/CollectionCard";
+import { fetchMagicEdenCollection, fetchUserCollectionByContract } from "@/lib/clients/magicEdenClient";
 
 export default function CollectionInspectorPage() {
   const [contract, setContract] = useState("");
@@ -21,19 +22,18 @@ export default function CollectionInspectorPage() {
     setLoading(true);
 
     try {
-      const res = await fetch(`/api/magiceden/collection/${contract}`);
-      if (!res.ok) throw new Error("Collection not found");
+      const result = await fetchMagicEdenCollection(contract as `0x${string}`);
+      if (!result) {
+        setError("Collection not found or invalid contract.");
+        return;
+      }
 
-      const result = await res.json();
       setCollection(result);
 
       if (address) {
-        const userRes = await fetch(`/api/magiceden/user-collection/${address}/${contract}`);
-        if (userRes.ok) {
-          const userData = await userRes.json();
-          if (parseInt(userData.ownership.tokenCount) > 0) {
-            setIsHolder(true);
-          }
+        const userData = await fetchUserCollectionByContract(address, contract);
+        if (userData && parseInt(userData.ownership.tokenCount) > 0) {
+          setIsHolder(true);
         }
       }
     } catch {
