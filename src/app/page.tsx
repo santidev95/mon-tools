@@ -9,11 +9,11 @@ export default function HomePage() {
           description="Inspect a ERC-20 token details"
           href="/erc20"
         />
-        <ToolCard
+        {/* <ToolCard
           title="NFT Inspector"
           description="Details of any NFT collection"
           href="/nft"
-        />
+        /> */}
         <ToolCard
           title="Token Bulk Transfer"
           description="Send a token amount to multiple wallets"
