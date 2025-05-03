@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useAccount } from "wagmi";
 import CollectionCard from "@/components/CollectionCard";
-import { fetchMagicEdenCollection, fetchUserCollectionByContract } from "@/lib/clients/magicEdenClient";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function CollectionInspectorPage() {
   const [contract, setContract] = useState("");
@@ -11,6 +11,7 @@ export default function CollectionInspectorPage() {
   const [isHolder, setIsHolder] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [holderChecked, setHolderChecked] = useState(false);
 
   const { address } = useAccount();
 
@@ -19,6 +20,7 @@ export default function CollectionInspectorPage() {
     setCollection(null);
     setError("");
     setIsHolder(false);
+    setHolderChecked(false); // reset antes da checagem
     setLoading(true);
   
     try {
@@ -39,11 +41,13 @@ export default function CollectionInspectorPage() {
         const userRes = await fetch(`/api/magiceden/user-collection/${address}/${contract}`);
         if (userRes.ok) {
           const userData = await userRes.json();
-          if (parseInt(userData.ownership.tokenCount) > 0) {
+          if (userData.collections.length > 0) {
             setIsHolder(true);
           }
         }
       }
+  
+      setHolderChecked(true); // só ativa depois de checar
     } catch {
       setError("Failed to fetch collection.");
     } finally {
@@ -81,11 +85,38 @@ export default function CollectionInspectorPage() {
 
       {error && <p className="text-red-400 mt-4">{error}</p>}
 
-      {collection && (
-        <>
-          {isHolder && (
-            <p className="mt-4 text-green-400 font-mono text-sm">✅ You are a holder of this collection!</p>
-          )}
+      {collection && holderChecked && (
+        <>        
+        {address && (
+          <>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={isHolder ? "holder" : "not-holder"}
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -5 }}
+              transition={{ duration: 0.3 }}
+              className={`mt-4 px-4 py-3 rounded-lg border text-sm font-mono 
+                ${isHolder ? "border-green-400 text-green-300 bg-green-900/10" : "border-red-400 text-red-300 bg-red-900/10"}`}
+            >
+              <span className="inline-flex items-center gap-2">
+                {isHolder ? (
+                  <>
+                    <span className="animate-pulse text-green-400">✅</span>
+                    <span>You are a holder of this collection</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-red-400">❌</span>
+                    <span>You are <strong>not</strong> a holder of this collection</span>
+                  </>
+                )}
+              </span>
+            </motion.div>
+          </AnimatePresence>
+          </>
+        )}         
+
           <CollectionCard data={collection} />
         </>
       )}
