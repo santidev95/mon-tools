@@ -18,6 +18,12 @@ export default function HomePage() {
           title="Token Bulk Transfer"
           description="Send a token amount to multiple wallets"
           href="/bulktransfer"
+        />    
+
+        <ToolCard
+          title="Merkle Root Generator"
+          description="Generate a merkle root and proofs"
+          href="/merklegenerate"
         />        
       </div>
     </main>
