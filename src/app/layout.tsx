@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Monadic Tools",
+  title: "MonTools",
   description: "Tools for Monad Tesnet",
 };
 
