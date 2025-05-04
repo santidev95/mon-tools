@@ -17,7 +17,7 @@ export default function Navbar() {
           <Link href="/" className="flex items-center gap-2">
           <Image src="/logo.png" alt="Logo" width={65} height={65} />
           <span className="text-base font-bold text-violet-400 font-mono">
-            Monadic Tools
+            MonTools
           </span>
           </Link>
         </div>
