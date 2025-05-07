@@ -1,4 +1,4 @@
-import { useWalletClient } from "wagmi";
+import { useWalletClient, usePublicClient } from "wagmi";
 import { parseUnits, parseEther, type Abi } from "viem";
 
 const ERC20_ABI: Abi = [
@@ -32,6 +32,7 @@ const BULK_TRANSFER_ADDRESS = "0x73Fc1b28F405df9B4B97960F1A0C64C656708524";
 
 export function useBulkTransferWithApprove() {
   const { data: walletClient } = useWalletClient();
+  const publicClient = usePublicClient();
 
   const execute = async (
     token: `0x${string}` | "native",
@@ -39,7 +40,7 @@ export function useBulkTransferWithApprove() {
     recipients: string[],
     amountEach: string
   ) => {
-    if (!walletClient) throw new Error("Wallet not connected");
+    if (!walletClient || !publicClient) throw new Error("Wallet or public client not connected");
 
     if (token === "native") {
       const parsedAmount = parseEther(amountEach);
@@ -54,24 +55,26 @@ export function useBulkTransferWithApprove() {
       return;
     }
 
-    // ERC20 logic
     const parsedAmount = parseUnits(amountEach, decimals);
     const totalAmount = parsedAmount * BigInt(recipients.length);
 
     // Step 1: approve
-    await walletClient.writeContract({
+    const approveHash = await walletClient.writeContract({
       address: token,
       abi: ERC20_ABI,
       functionName: "approve",
-      args: [BULK_TRANSFER_ADDRESS, totalAmount]
+      args: [BULK_TRANSFER_ADDRESS, totalAmount],
     });
 
-    // Step 2: call batchTransfer
+    // ✅ Espera confirmação do approve
+    await publicClient.waitForTransactionReceipt({ hash: approveHash });
+
+    // Step 2: batchTransfer
     await walletClient.writeContract({
       address: BULK_TRANSFER_ADDRESS,
       abi: BULK_TRANSFER_ABI,
       functionName: "batchTransfer",
-      args: [token, recipients as `0x${string}`[], parsedAmount]
+      args: [token, recipients as `0x${string}`[], parsedAmount],
     });
   };
 
