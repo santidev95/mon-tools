@@ -4,6 +4,11 @@ export default function HomePage() {
   return (
     <main className="max-w-6xl mx-auto px-6 py-10">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      {/* <ToolCard
+          title="Your Portfolio"
+          description="See your address portfolio"
+          href="/portfolio"
+        /> */}
       <ToolCard
           title="ERC-20 tool"
           description="Inspect a ERC-20 token details"
