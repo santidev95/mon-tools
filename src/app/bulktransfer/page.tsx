@@ -17,7 +17,7 @@ const tokenList = [
   "0xB5a30b0FDc5EA94A52fDc42e3E9760Cb8449Fb37",
   "0xA296f47E8Ff895Ed7A092b4a9498bb13C46ac768",
   "0x0C0c92FcF37Ae2CBCc512e59714Cd3a1A1cbc411",
-  "0x82612805d63a97e4a4263c46cf3f7478ebd7d2db",
+  "0x8507F576EB214d172012065d58cfb38a4540b0a6",
 ] as `0x${string}`[];
 
 export default function BulkTransferPage() {
