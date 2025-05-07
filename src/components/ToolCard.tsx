@@ -1,24 +1,53 @@
 import Link from "next/link";
 import Image from "next/image";
+import clsx from "clsx";
 
 interface ToolCardProps {
   title: string;
   description: string;
   href: string;
+  active?: boolean;
 }
 
-export default function ToolCard({ title, description, href }: ToolCardProps) {
-  return (
-    <Link
-      href={href}
-      className="bg-zinc-900 border border-zinc-800 hover:border-purple-400 rounded-xl p-4 transition duration-200 shadow group"
-    >
+export default function ToolCard({
+  title,
+  description,
+  href,
+  active = true,
+}: ToolCardProps) {
+  const baseClasses = clsx(
+    "border rounded-xl p-4 transition duration-200 shadow group",
+    {
+      "bg-zinc-900 border-zinc-800 hover:border-purple-400": active,
+      "bg-zinc-800 border-zinc-700 cursor-not-allowed opacity-50": !active,
+    }
+  );
+
+  const content = (
+    <>
       <div className="flex items-center gap-4 mb-2">
-        <h3 className="text-violet-400 text-lg font-bold">{title}</h3>
+        <h3 className={clsx("text-lg font-bold", active ? "text-violet-400" : "text-gray-500")}>
+          {title}
+        </h3>
       </div>
-      <p className="text-sm text-gray-400 group-hover:text-gray-300 transition">
+      <p
+        className={clsx(
+          "text-sm transition",
+          active ? "text-gray-400 group-hover:text-gray-300" : "text-gray-500"
+        )}
+      >
         {description}
       </p>
+    </>
+  );
+
+  return active ? (
+    <Link href={href} className={baseClasses}>
+      {content}
     </Link>
+  ) : (
+    <div className={baseClasses} aria-disabled="true">
+      {content}
+    </div>
   );
 }
