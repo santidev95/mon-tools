@@ -11,10 +11,10 @@ export default function HomePage() {
           active={false}
         />
         <ToolCard
-          title="ERC-20 Token Deployer (soon)"
+          title="ERC-20 Token Deployer"
           description="Deploy your customized ERC-20 token"
-          href="/portfolio"
-          active={false}
+          href="/deployer"
+          active={true}
         />
       <ToolCard
           title="ERC-20 Inspector"

@@ -40,7 +40,7 @@ export default async function RootLayout({
           <main>
             {children}
           </main>
-          <Toaster position="bottom-right" />
+          <Toaster position="bottom-center"/>
           <footer className="w-full text-center text-sm py-2 absolute bottom-0">
           <span className="text-violet-400 font-mono">
             <a href="https://x.com/gabriell_santi" target="_blank" rel="noopener noreferrer">
