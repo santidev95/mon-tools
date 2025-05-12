@@ -1,0 +1,121 @@
+"use client";
+import { useState } from "react";
+import AppIcon from "./AppIcon";
+import OSWindow from "./OSWindow";
+import Taskbar from "./Taskbar";
+import TokenInspectorApp from "./apps/TokenInspectorApp";
+import TokenDeployerApp from "./apps/TokenDeployerApp";
+import BulkTransferApp from "./apps/BulkTransferApp";
+import MerkleToolApp from "./apps/MerkleToolApp";
+import CollectionInspectorApp from "./apps/CollectionInspectorApp";
+
+
+type MonToolsOSProps = {
+  backgroundImage?: string;
+};
+
+export default function MonToolsOS({ backgroundImage = "/back.png" }: MonToolsOSProps) {
+  const [openApps, setOpenApps] = useState<{ [key: string]: boolean }>({
+    deployer: false,
+    inspector: false,
+    bulktransfer: false,
+    merkle: false,
+    nft: false,
+  });
+
+  const openApp = (app: string) =>
+    setOpenApps((prev) => ({ ...prev, [app]: true }));
+
+  const closeApp = (app: string) =>
+    setOpenApps((prev) => ({ ...prev, [app]: false }));
+
+  return (
+    <div
+      className="h-screen w-screen bg-no-repeat bg-center bg-cover relative overflow-hidden font-mono"
+      style={{ backgroundImage: `url(${backgroundImage})` }}
+    >
+      {/* Ícones no Desktop */}
+      <div className="absolute top-4 left-4 flex flex-col gap-4">        
+        <AppIcon
+          icon="/logo.png"
+          label="ERC20 Token Deployer"
+          onClick={() => openApp("deployer")}
+        />
+        <AppIcon
+          icon="/logo.png"
+          label="Token Inspector"
+          onClick={() => openApp("inspector")}
+        />
+        <AppIcon
+          icon="/logo.png"
+          label="Bulk Transfer"
+          onClick={() => openApp("bulktransfer")}
+        />      
+        <AppIcon
+          icon="/logo.png"
+          label="Merkle Tool"
+          onClick={() => openApp("merkle")}
+        />
+        <AppIcon
+          icon="/logo.png"
+          label="NFT Inspector"
+          onClick={() => openApp("nft")}
+        />
+      </div>
+
+      {/* Janelas */}
+      {openApps.inspector && (
+        <OSWindow
+          title="Token Inspector"
+          onClose={() => closeApp("inspector")}
+          defaultSize={{ width: 360, height: 300 }} // 💡 NOVO: define tamanho ideal
+        >
+          <TokenInspectorApp />
+        </OSWindow>
+      )}      
+      
+      {openApps.deployer && (
+        <OSWindow
+          title="Token Deployer"
+          onClose={() => closeApp("deployer")}
+          defaultSize={{ width: 400, height: 500 }}
+        >
+          <TokenDeployerApp />
+        </OSWindow>
+      )}
+
+      {openApps.bulktransfer && (
+        <OSWindow
+          title="Bulk Transfer"
+          onClose={() => closeApp("bulktransfer")}
+          defaultSize={{ width: 400, height: 520 }}
+        >
+          <BulkTransferApp />
+        </OSWindow>
+      )}     
+
+      {openApps.merkle && (
+        <OSWindow
+          title="Merkle Proof Tool"
+          onClose={() => closeApp("merkle")}
+          defaultSize={{ width: 600, height: 700 }}
+        >
+          <MerkleToolApp />
+        </OSWindow>
+      )}
+
+      {openApps.nft && (
+        <OSWindow
+          title="NFT Inspector"
+          onClose={() => closeApp("nft")}
+          defaultSize={{ width: 400, height: 520 }}
+        >
+          <CollectionInspectorApp />
+        </OSWindow>
+      )}
+
+      {/* Barra de Tarefas */}
+      <Taskbar />
+    </div>
+  );
+}

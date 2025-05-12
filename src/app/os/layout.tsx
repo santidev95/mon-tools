@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import "../globals.css";
 import { headers } from "next/headers";
-import LayoutClient from "@/components/LayoutClient";
+import ContextProvider from "@/context";
+import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,24 +14,22 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "MonTools",
-  description: "Tools for Monad Tesnet",
-};
-
-export default async function RootLayout({
+export default async function OSLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   const headersObj = await headers();
   const cookies = headersObj.get("cookie");
 
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <LayoutClient cookies={cookies}>{children}</LayoutClient>
+        <ContextProvider cookies={cookies}>
+          <main>{children}</main>
+          <Toaster position="bottom-center" />
+        </ContextProvider>
       </body>
     </html>
   );
-}
+} 

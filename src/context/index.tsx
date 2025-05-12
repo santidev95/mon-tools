@@ -35,8 +35,8 @@ const modal = createAppKit({
     "--w3m-color-mix": "#000000",           
     "--w3m-color-mix-strength": 0,          
     "--w3m-font-family": "monospace",       
-    "--w3m-font-size-master": "16px",
-    "--w3m-border-radius-master": "0",
+    "--w3m-font-size-master": "9px",
+    "--w3m-border-radius-master": "5px",
   }
 })
 
