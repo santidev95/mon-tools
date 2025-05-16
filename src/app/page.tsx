@@ -37,6 +37,12 @@ export default function HomePage() {
           active={false}
         />
         <ToolCard
+          title="MonBridge (soon)"
+          description="Bridge in Multichains"
+          href="/portfolio"
+          active={false}
+        />
+        <ToolCard
           title="ERC-20 Token Deployer"
           description="Deploy your customized ERC-20 token"
           href="/deployer"
