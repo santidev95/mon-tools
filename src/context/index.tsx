@@ -14,9 +14,9 @@ if (!projectId) {
 }
 
 const metadata = {
-  name: 'monadic-tools',
-  description: 'Monadic Tools',
-  url: 'http://localhost:3000', 
+  name: 'montools',
+  description: 'MonTools',
+  url: 'https://montools.xyz', 
   icons: ['https://avatars.githubusercontent.com/u/179229932']
 }
 

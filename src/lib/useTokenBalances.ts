@@ -10,7 +10,7 @@ import { monadTestnet } from "viem/chains";
 
 const publicClient = createPublicClient({
   chain: monadTestnet,
-  transport: http("https://monad-testnet.g.alchemy.com/v2/FZhCjyj9iYvSCrnRcV4CcDXKzFrfrp5m"),
+  transport: http(process.env.ALCHEMY_URL),
 });
 
 const ERC20_ABI = [

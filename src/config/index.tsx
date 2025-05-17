@@ -3,7 +3,7 @@ import { cookieStorage, createStorage, http } from '@wagmi/core'
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
 import { monadTestnet } from '@reown/appkit/networks'
 
-export const projectId = '854d07d1f47b43a5aa7a7d35e9a4d29f'
+export const projectId = process.env.NEXT_PUBLIC_REOWN_PROJECT_ID
 
 if (!projectId) {
   throw new Error('Project ID is not defined')

@@ -8,7 +8,7 @@ import {
   
   const client = createPublicClient({
     chain: monadTestnet,
-    transport: http("https://monad-testnet.g.alchemy.com/v2/FZhCjyj9iYvSCrnRcV4CcDXKzFrfrp5m"),
+    transport: http(process.env.ALCHEMY_URL),
   });
   
   export async function detectErc20Info(address: `0x${string}`) {
