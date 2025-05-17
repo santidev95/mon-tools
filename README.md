@@ -1,6 +1,6 @@
-# Monadic Tools
+# MonTools
 
-Monadic Tools is a modern, modular web application providing a suite of utilities for interacting with tokens and NFTs on EVM-compatible blockchains. It features a unique desktop-like interface (MonTools OS) for seamless navigation between tools, as well as traditional web navigation.
+MonTools  is a modern, modular web application providing a suite of utilities for interacting with tokens and NFTs on EVM-compatible blockchains. It features a unique desktop-like interface (MonTools OS) for seamless navigation between tools, as well as traditional web navigation.
 
 ## Features
 
@@ -10,6 +10,9 @@ Monadic Tools is a modern, modular web application providing a suite of utilitie
 - **NFT Inspector**: View details of any NFT collection and check if your connected wallet is a holder.
 - **Token Bulk Transfer**: Send a specified amount of a token to multiple addresses in a single operation.
 - **Merkle Root Generator**: Generate a Merkle root and proofs from a list of addresses, with downloadable proofs.
+
+## Deployed Version
+### Access here: https://montools.xyz
 
 ## Getting Started
 
@@ -30,7 +33,7 @@ Monadic Tools is a modern, modular web application providing a suite of utilitie
    # or
    yarn install
    ```
-3. Create a `.env.local` file for environment variables as needed.
+3. Create a `.env.local` file, use `env.example` for environment variables as needed.
 
 ### Running Locally
 
