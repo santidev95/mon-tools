@@ -8,6 +8,7 @@ import TokenDeployerApp from "./apps/TokenDeployerApp";
 import BulkTransferApp from "./apps/BulkTransferApp";
 import MerkleToolApp from "./apps/MerkleToolApp";
 import CollectionInspectorApp from "./apps/CollectionInspectorApp";
+import SwapApp from "./apps/SwapApp";
 
 
 type MonToolsOSProps = {
@@ -21,6 +22,7 @@ export default function MonToolsOS({ backgroundImage = "/back.png" }: MonToolsOS
     bulktransfer: false,
     merkle: false,
     nft: false,
+    swap: false,
   });
 
   const openApp = (app: string) =>
@@ -60,6 +62,11 @@ export default function MonToolsOS({ backgroundImage = "/back.png" }: MonToolsOS
           icon="/logo.png"
           label="NFT Inspector"
           onClick={() => openApp("nft")}
+        />
+        <AppIcon
+          icon="/logo.png"
+          label="Swap"
+          onClick={() => openApp("swap")}
         />
       </div>
 
@@ -111,6 +118,16 @@ export default function MonToolsOS({ backgroundImage = "/back.png" }: MonToolsOS
           defaultSize={{ width: 400, height: 520 }}
         >
           <CollectionInspectorApp />
+        </OSWindow>
+      )}
+
+      {openApps.swap && (
+        <OSWindow
+          title="Token Swap"
+          onClose={() => closeApp("swap")}
+          defaultSize={{ width: 1000, height: 750 }}
+        >
+          <SwapApp />
         </OSWindow>
       )}
 
