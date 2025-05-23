@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useAccount, useWalletClient } from "wagmi";
+import { useAccount, useWalletClient, usePublicClient } from "wagmi";
 import { getTokensByCategory, TokenResult, getWalletBalances, TokenBalance } from "@/lib/clients/monorail/dataApi";
 import TokenSelectModal from "./TokenSelectModal";
 import { getQuote } from "@/lib/clients/monorail/quoteApi";
@@ -9,6 +9,7 @@ import React from "react";
 import { FiRefreshCw } from "react-icons/fi";
 import { IoSwapVerticalSharp } from "react-icons/io5";
 import toast from 'react-hot-toast';
+import { parseUnits, type Abi } from "viem";
 
 const CATEGORIES = [
   { key: "verified", label: "Verified" },
@@ -19,6 +20,20 @@ const CATEGORIES = [
 ];
 
 const QUOTE_EXPIRY_SECONDS = 60;
+
+// ABI padrão ERC20 para approve
+const ERC20_ABI: Abi = [
+  {
+    name: "approve",
+    type: "function",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "spender", type: "address" },
+      { name: "amount", type: "uint256" }
+    ],
+    outputs: [{ type: "bool" }]
+  }
+];
 
 export default function Swap() {
   const [category, setCategory] = useState(CATEGORIES[0].key);
@@ -41,10 +56,11 @@ export default function Swap() {
   const [sendError, setSendError] = useState<string | null>(null);
   const [txHash, setTxHash] = useState<string | null>(null);
   const { data: walletClient } = useWalletClient();
+  const publicClient = usePublicClient();
   // Função para recarregar o quote manualmente
   const [manualReloading, setManualReloading] = useState(false);
   const [quoteTimestamp, setQuoteTimestamp] = useState<number | null>(null);
-  const [quoteExpiry, setQuoteExpiry] = useState(QUOTE_EXPIRY_SECONDS); // segundos
+  const [quoteExpiry, setQuoteExpiry] = useState(QUOTE_EXPIRY_SECONDS); // seconds
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const [modalTokens, setModalTokens] = useState<TokenResult[]>([]);
   const [fromTokenBalance, setFromTokenBalance] = useState<string>("");
@@ -103,31 +119,32 @@ export default function Swap() {
   }, [modalOpen, modalCategory]);
 
   // Buscar saldo do token selecionado
+  const fetchBalance = async () => {
+    if (!sender || !fromToken) {
+      setFromTokenBalance("");
+      setFromTokenBalanceFormatted("");
+      return;
+    }
+    setBalanceLoading(true);
+    try {
+      const balances: TokenBalance[] = await getWalletBalances(sender);
+      const token = balances.find(b => b.address.toLowerCase() === fromToken.address.toLowerCase());
+      if (token) {
+        setFromTokenBalance(token.balance);         
+        setFromTokenBalanceFormatted(token.balance);
+      } else {
+        setFromTokenBalance("0");
+        setFromTokenBalanceFormatted("0");
+      }
+    } catch (e) {
+      setFromTokenBalance("");
+      setFromTokenBalanceFormatted("");
+    } finally {
+      setBalanceLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchBalance = async () => {
-      if (!sender || !fromToken) {
-        setFromTokenBalance("");
-        setFromTokenBalanceFormatted("");
-        return;
-      }
-      setBalanceLoading(true);
-      try {
-        const balances: TokenBalance[] = await getWalletBalances(sender);
-        const token = balances.find(b => b.address.toLowerCase() === fromToken.address.toLowerCase());
-        if (token) {
-          setFromTokenBalance(token.balance);         
-          setFromTokenBalanceFormatted(token.balance);
-        } else {
-          setFromTokenBalance("0");
-          setFromTokenBalanceFormatted("0");
-        }
-      } catch (e) {
-        setFromTokenBalance("");
-        setFromTokenBalanceFormatted("");
-      } finally {
-        setBalanceLoading(false);
-      }
-    };
     fetchBalance();
   }, [sender, fromToken]);
 
@@ -249,7 +266,7 @@ export default function Swap() {
             {/* Botão de reload ao lado */}
             <button
               className="text-gray-400 hover:text-violet-400 transition text-xl p-1 z-10 bg-transparent"
-              title="Recarregar cotação"
+              title="Reload quote"
               onClick={fetchQuote}
               disabled={manualReloading || quoteLoading}
               style={{ width: 40, height: 40, borderRadius: 20, position: 'relative' }}
@@ -355,14 +372,30 @@ export default function Swap() {
               setTxHash(null);
               if (!walletClient || !quoteData?.transaction) return;
               setSending(true);
-              const toastId = toast.loading('Sending transaction...');
+              const toastId = toast.loading('Approving token...');
               try {
+                // If not native token, do approve first
+                if (fromToken && fromToken.symbol !== "MON") {
+                  const amount = parseUnits(fromValue, Number(fromToken.decimals));
+                  const approveHash = await walletClient.writeContract({
+                    address: fromToken.address as `0x${string}`,
+                    abi: ERC20_ABI,
+                    functionName: "approve",
+                    args: [quoteData.transaction.to, amount],
+                  });
+                  toast.loading('Waiting for approve confirmation...', { id: toastId });
+                  if (!publicClient) throw new Error("Public client not available");
+                  await publicClient.waitForTransactionReceipt({ hash: approveHash });
+                  toast.success('Approve confirmed!', { id: toastId });
+                }
+                toast.loading('Sending swap...', { id: toastId });
                 const tx = await walletClient.sendTransaction({
                   to: quoteData.transaction.to as `0x${string}`,
                   data: quoteData.transaction.data as `0x${string}`,
                   value: quoteData.transaction.value ? BigInt(quoteData.transaction.value) : 0n,
                 });
                 setTxHash(tx);
+                // Show transaction sent toast
                 toast.custom((t) => (
                   <div className="bg-zinc-900 border border-green-400 rounded-lg p-4 text-white font-mono shadow-lg min-w-[220px]">
                     <div className="font-bold mb-1">Transaction sent!</div>
@@ -376,8 +409,10 @@ export default function Swap() {
                     </a>
                   </div>
                 ), { id: toastId, duration: 6000 });
+                // Update balance after 3s
+                setTimeout(() => { fetchBalance(); }, 5000);
               } catch (err: any) {
-                const errorMsg = err?.message || "Erro ao enviar transação";
+                const errorMsg = err?.message || "Error sending transaction";
                 setSendError(errorMsg);
                 toast.custom((t) => (
                   <div className="bg-zinc-900 border border-red-400 rounded-lg p-4 text-white font-mono shadow-lg min-w-[220px]">
@@ -456,15 +491,12 @@ export default function Swap() {
                               </span>
                             )}
                           </div>
-                          {arr.length > 1 && idx < arr.length - 1 && (
+                          {(arr.length === 1 || idx < arr.length - 1) && (
                             <span className="text-violet-400 text-lg my-1">↓</span>
                           )}
                         </React.Fragment>
                       );
                     })}
-                    {bestRouteArr.length > 1 && (
-                      <span className="text-violet-400 text-lg my-1">↓</span>
-                    )}
                     <span className="text-white text-base font-bold mt-2">{toToken?.symbol}</span>
                   </div>
                 ) : (
