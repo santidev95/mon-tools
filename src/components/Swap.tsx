@@ -1,232 +1,52 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { useAccount, useWalletClient, usePublicClient } from "wagmi";
-import { getTokensByCategory, TokenResult, getWalletBalances, TokenBalance } from "@/lib/clients/monorail/dataApi";
-import TokenSelectModal from "./TokenSelectModal";
-import { getQuote } from "@/lib/clients/monorail/quoteApi";
 import React from "react";
 import { FiRefreshCw } from "react-icons/fi";
 import { IoSwapVerticalSharp } from "react-icons/io5";
 import toast from 'react-hot-toast';
-import { parseUnits, type Abi } from "viem";
-
-const CATEGORIES = [
-  { key: "verified", label: "Verified" },
-  { key: "stable", label: "Stablecoin" },
-  { key: "lst", label: "LST" },
-  { key: "bridged", label: "Bridged" },
-  { key: "meme", label: "Meme" },
-];
-
-const QUOTE_EXPIRY_SECONDS = 60;
-
-// ABI padrão ERC20 para approve
-const ERC20_ABI: Abi = [
-  {
-    name: "approve",
-    type: "function",
-    stateMutability: "nonpayable",
-    inputs: [
-      { name: "spender", type: "address" },
-      { name: "amount", type: "uint256" }
-    ],
-    outputs: [{ type: "bool" }]
-  }
-];
+import TokenSelectModal from "./TokenSelectModal";
+import { parseUnits } from "viem";
+import { useSwapLogic } from "@/hooks/useSwapLogic";
 
 export default function Swap() {
-  const [category, setCategory] = useState(CATEGORIES[0].key);
-  const [modalCategory, setModalCategory] = useState(CATEGORIES[0].key);
-  const [tokens, setTokens] = useState<TokenResult[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [fromToken, setFromToken] = useState<TokenResult | null>(null);
-  const [toToken, setToToken] = useState<TokenResult | null>(null);
-  const [fromValue, setFromValue] = useState("1");
-  const [toValue, setToValue] = useState("");
-  const [price, setPrice] = useState("");
-  const [minReceived, setMinReceived] = useState("");
-  const [marketImpact, setMarketImpact] = useState("");
-  const [modalOpen, setModalOpen] = useState<"from" | "to" | null>(null);
-  const { address: sender } = useAccount();
-  const [quoteLoading, setQuoteLoading] = useState(false);
-  const [quoteError, setQuoteError] = useState<string | null>(null);
-  const [quoteData, setQuoteData] = useState<any>(null);
-  const [sending, setSending] = useState(false);
-  const [sendError, setSendError] = useState<string | null>(null);
-  const [txHash, setTxHash] = useState<string | null>(null);
-  const { data: walletClient } = useWalletClient();
-  const publicClient = usePublicClient();
-  // Função para recarregar o quote manualmente
-  const [manualReloading, setManualReloading] = useState(false);
-  const [quoteTimestamp, setQuoteTimestamp] = useState<number | null>(null);
-  const [quoteExpiry, setQuoteExpiry] = useState(QUOTE_EXPIRY_SECONDS); // seconds
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const [modalTokens, setModalTokens] = useState<TokenResult[]>([]);
-  const [fromTokenBalance, setFromTokenBalance] = useState<string>("");
-  const [fromTokenBalanceFormatted, setFromTokenBalanceFormatted] = useState<string>("");
-  const [balanceLoading, setBalanceLoading] = useState(false);
-
-  useEffect(() => {
-    setLoading(true);
-    getTokensByCategory(category)
-      .then((data) => {
-        setTokens(data);
-        // Find MON token by symbol
-        const monToken = data.find(t => t.symbol === "MON");
-        if (!fromToken || !data.find(t => t.address === fromToken.address)) setFromToken(monToken || data[0] || null);
-        // Find USDC token by symbol
-        const usdcToken = data.find(t => t.symbol === "USDC");
-        if (!toToken || !data.find(t => t.address === toToken.address)) setToToken(usdcToken || data[1] || null);
-      })
-      .finally(() => setLoading(false));
-    // eslint-disable-next-line
-  }, [category]);
-
-  // useEffect para atualizar quote automaticamente
-  useEffect(() => {
-    fetchQuote();
-    // eslint-disable-next-line
-  }, [fromToken, toToken, fromValue, sender]);
-
-  // Atualiza o timer de expiração
-  useEffect(() => {
-    if (!quoteTimestamp) return;
-    if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = setInterval(() => {
-      const elapsed = Math.floor((Date.now() - quoteTimestamp) / 1000);
-      const remaining = Math.max(0, QUOTE_EXPIRY_SECONDS - elapsed);
-      setQuoteExpiry(remaining);
-      if (remaining === 0) {
-        clearInterval(timerRef.current!);
-        fetchQuote();
-      }
-    }, 1000);
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
-  }, [quoteTimestamp]);
-
-  // Atualiza tokens da modal ao abrir ou trocar categoria na modal
-  useEffect(() => {
-    if (!modalOpen) return;
-    setLoading(true);
-    getTokensByCategory(modalCategory)
-      .then((data) => {
-        setModalTokens(data);
-      })
-      .finally(() => setLoading(false));
-  }, [modalOpen, modalCategory]);
-
-  // Buscar saldo do token selecionado
-  const fetchBalance = async () => {
-    if (!sender || !fromToken) {
-      setFromTokenBalance("");
-      setFromTokenBalanceFormatted("");
-      return;
-    }
-    setBalanceLoading(true);
-    try {
-      const balances: TokenBalance[] = await getWalletBalances(sender);
-      const token = balances.find(b => b.address.toLowerCase() === fromToken.address.toLowerCase());
-      if (token) {
-        setFromTokenBalance(token.balance);         
-        setFromTokenBalanceFormatted(token.balance);
-      } else {
-        setFromTokenBalance("0");
-        setFromTokenBalanceFormatted("0");
-      }
-    } catch (e) {
-      setFromTokenBalance("");
-      setFromTokenBalanceFormatted("");
-    } finally {
-      setBalanceLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchBalance();
-  }, [sender, fromToken]);
-
-  // Função para recarregar o quote manualmente
-  const fetchQuote = async () => {
-    if (!fromToken || !toToken || !fromValue || Number(fromValue) <= 0) {
-      setToValue("");
-      setPrice("");
-      setMinReceived("");
-      setMarketImpact("");
-      setQuoteData(null);
-      setQuoteTimestamp(null);
-      setQuoteExpiry(QUOTE_EXPIRY_SECONDS);
-      return;
-    }
-    setQuoteLoading(true);
-    setManualReloading(true);
-    setQuoteError(null);
-    try {
-      const amount = fromValue;
-      const quote = await getQuote({
-        from: fromToken.address,
-        to: toToken.address,
-        amount,
-        sender: sender || undefined,
-        deadline: QUOTE_EXPIRY_SECONDS,
-        source: "montools"
-      });
-      setQuoteData(quote);
-      setToValue(quote.output_formatted);
-      let priceValue = "";
-      if (quote.input_formatted && quote.output_formatted) {
-        const input = Number(quote.input_formatted);
-        const output = Number(quote.output_formatted);
-        if (input > 0) {
-          priceValue = (output / input).toFixed(6);
-        }
-      }
-      setPrice(priceValue);
-      setMinReceived(quote.min_output_formatted);
-      const weightedImpact = quote.routes?.[0]?.[0]?.weighted_price_impact;
-      setMarketImpact(
-        weightedImpact ? Number(weightedImpact).toFixed(2) : ""
-      );
-      setQuoteTimestamp(Date.now());
-      setQuoteExpiry(QUOTE_EXPIRY_SECONDS);
-    } catch (err: any) {
-      setQuoteError(err?.message || "Failed to fetch quote");
-      setToValue("");
-      setPrice("");
-      setMinReceived("");
-      setMarketImpact("");
-      setQuoteData(null);
-      setQuoteTimestamp(null);
-      setQuoteExpiry(QUOTE_EXPIRY_SECONDS);
-    } finally {
-      setQuoteLoading(false);
-      setManualReloading(false);
-    }
-  };
-
-  const handleSwitch = () => {
-    setFromToken(toToken);
-    setToToken(fromToken);
-  };
-
-  // Escolher a rota de menor fee total
-  let bestRouteArr: any[] = [];
-  if (Array.isArray(quoteData?.routes) && quoteData.routes.length > 0) {
-    let minFee = null;
-    for (const routeArr of quoteData.routes) {
-      const totalFee = routeArr.reduce(
-        (acc: number, route: any) =>
-          acc + (route.splits?.reduce((a: number, split: any) => a + Number(split.fee), 0) ?? 0),
-        0
-      );
-      if (minFee === null || totalFee < minFee) {
-        minFee = totalFee;
-        bestRouteArr = routeArr;
-      }
-    }
-  }
+  const {
+    CATEGORIES,
+    category, setCategory,
+    modalCategory, setModalCategory,
+    tokens, setTokens,
+    loading, setLoading,
+    fromToken, setFromToken,
+    toToken, setToToken,
+    fromValue, setFromValue,
+    toValue, setToValue,
+    price, setPrice,
+    minReceived, setMinReceived,
+    marketImpact, setMarketImpact,
+    modalOpen, setModalOpen,
+    sender,
+    quoteLoading, setQuoteLoading,
+    quoteError, setQuoteError,
+    quoteData, setQuoteData,
+    sending, setSending,
+    sendError, setSendError,
+    txHash, setTxHash,
+    walletClient,
+    publicClient,
+    manualReloading, setManualReloading,
+    quoteTimestamp, setQuoteTimestamp,
+    quoteExpiry, setQuoteExpiry,
+    timerRef,
+    modalTokens, setModalTokens,
+    fromTokenBalance, setFromTokenBalance,
+    fromTokenBalanceFormatted, setFromTokenBalanceFormatted,
+    balanceLoading, setBalanceLoading,
+    fetchBalance,
+    fetchQuote,
+    handleSwitch,
+    bestRouteArr,
+    ERC20_ABI,
+    QUOTE_EXPIRY_SECONDS
+  } = useSwapLogic();
 
   return (
     <div className="flex flex-col md:flex-row gap-8 justify-center items-center w-full min-h-[70vh] py-10">
@@ -322,11 +142,14 @@ export default function Swap() {
                 <span className="text-xs text-violet-400 font-mono truncate max-w-[80px]">{fromToken?.name}</span>
               </div>
               <input
-                type="number"
-                min="0"
+                type="text"
                 value={fromValue}
-                onChange={e => setFromValue(e.target.value)}
-                className="bg-transparent text-white font-mono text-right flex-1 outline-none text-xl px-2"
+                onChange={e => {
+                  // Permite apenas números, vírgula e ponto
+                  const value = e.target.value.replace(/[^0-9.,]/g, "");
+                  setFromValue(value);
+                }}
+                className="bg-transparent text-white font-mono text-right flex-1 outline-none text-xl px-2 appearance-none"
                 onClick={e => e.stopPropagation()}
               />              
             </div>
@@ -376,7 +199,7 @@ export default function Swap() {
               try {
                 // If not native token, do approve first
                 if (fromToken && fromToken.symbol !== "MON") {
-                  const amount = parseUnits(fromValue, Number(fromToken.decimals));
+                  const amount = parseUnits(fromValue.replace(',', '.'), Number(fromToken.decimals));
                   const approveHash = await walletClient.writeContract({
                     address: fromToken.address as `0x${string}`,
                     abi: ERC20_ABI,
@@ -475,7 +298,7 @@ export default function Swap() {
               ) : (
                 bestRouteArr.length > 0 ? (
                   <div className="flex flex-col items-center gap-2">
-                    {bestRouteArr.map((route: any, idx: number, arr: any[]) => {
+                    {bestRouteArr.map((route, idx, arr) => {
                       const numAMMs = route.splits?.length || 0;
                       const avgFee = numAMMs > 0 ? (route.splits.reduce((acc: number, split: any) => acc + Number(split.fee), 0) / numAMMs) : 0;
                       const marketImpact = route.weighted_price_impact ? Number(route.weighted_price_impact) : null;
