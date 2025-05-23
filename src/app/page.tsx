@@ -2,6 +2,7 @@
 
 import ToolCard from "@/components/ToolCard";
 import MonToolsOS from "@/components/os/MonToolsOS";
+import { HoverBorderGradient } from "@/components/ui/hoverBoardGradient";
 import { useRouter } from "next/navigation";
 
 const useOSLayout = process.env.NEXT_PUBLIC_USE_OS_LAYOUT === "true";
@@ -21,12 +22,13 @@ export default function HomePage() {
   return (
     <main className="max-w-6xl mx-auto px-6 py-10">
       <div className="flex flex-col items-center mb-8">
-        <button
+        <HoverBorderGradient
           onClick={handleTryOS}
-          className="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:scale-105 transition-transform duration-200 mb-2"
+          as="button"
+          containerClassName="mb-2"
         >
-          Try MonTools OS 🚀
-        </button>
+          Click & Try MonTools OS 🚀
+        </HoverBorderGradient>
         <span className="text-gray-500 text-sm">A new navigation experience for your tools</span>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
@@ -40,6 +42,12 @@ export default function HomePage() {
           title="MonBridge (soon)"
           description="Bridge in Multichains"
           href="/portfolio"
+          active={false}
+        />
+        <ToolCard
+          title="MonSwap (soon)"
+          description="Swap in tokens in Monad"
+          href="/swap"
           active={false}
         />
         <ToolCard
