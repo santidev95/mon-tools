@@ -45,10 +45,10 @@ export default function HomePage() {
           active={false}
         />
         <ToolCard
-          title="MonSwap"
+          title="MonSwap (soon)"
           description="Swap in tokens in Monad"
           href="/swap"
-          active={true}
+          active={false}
         />
         <ToolCard
           title="ERC-20 Token Deployer"
