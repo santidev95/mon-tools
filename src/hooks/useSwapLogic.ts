@@ -153,7 +153,7 @@ export function useSwapLogic() {
         from: fromToken.address,
         to: toToken.address,
         amount,
-        sender: sender || undefined,
+        sender: sender || "",
         deadline: QUOTE_EXPIRY_SECONDS,
         source: "montools"
       });
