@@ -32,7 +32,7 @@ export interface ErrorResponse {
   message: string;
 }
 
-const BASE_URL = 'https://testnet-api.monorail.xyz/v1';
+const BASE_URL = '/api/monorail/data';
 
 // Get a token by contract address
 export async function getToken(contractAddress: string): Promise<TokenDetails> {
@@ -43,26 +43,24 @@ export async function getToken(contractAddress: string): Promise<TokenDetails> {
 
 // Get a list of all available tokens
 export async function getTokens(params?: { find?: string; offset?: string; limit?: string }): Promise<TokenResult[]> {
-  const url = new URL(`${BASE_URL}/tokens`);
+  let url = `${BASE_URL}/tokens`;
   if (params) {
-    if (params.find) url.searchParams.append('find', params.find);
-    if (params.offset) url.searchParams.append('offset', params.offset);
-    if (params.limit) url.searchParams.append('limit', params.limit);
+    const search = new URLSearchParams(params as any).toString();
+    if (search) url += `?${search}`;
   }
-  const res = await fetch(url.toString());
+  const res = await fetch(url);
   if (!res.ok) throw await res.json();
   return res.json();
 }
 
 // Get a list of tokens in a specific category
 export async function getTokensByCategory(category: string, params?: { address?: string; offset?: number; limit?: number }): Promise<TokenResult[]> {
-  const url = new URL(`${BASE_URL}/tokens/category/${category}`);
+  let url = `${BASE_URL}/tokens/category/${category}`;
   if (params) {
-    if (params.address) url.searchParams.append('address', params.address);
-    if (params.offset !== undefined) url.searchParams.append('offset', params.offset.toString());
-    if (params.limit !== undefined) url.searchParams.append('limit', params.limit.toString());
+    const search = new URLSearchParams(params as any).toString();
+    if (search) url += `?${search}`;
   }
-  const res = await fetch(url.toString());
+  const res = await fetch(url);
   if (!res.ok) throw await res.json();
   return res.json();
 }

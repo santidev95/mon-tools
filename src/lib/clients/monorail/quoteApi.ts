@@ -67,25 +67,18 @@ export interface GetQuoteParams {
   source?: string;
 }
 
-const BASE_URL = 'https://testnet-pathfinder-v2.monorail.xyz/v3';
+const BASE_URL = '/api/monorail/quote';
 
 /**
  * Get a detailed quote for swapping tokens, including price impact, routes, and transaction data.
  * @param params Query parameters for the quote request
  */
 export async function getQuote(params: GetQuoteParams): Promise<PathfinderQuoteOutput> {
-  const url = new URL(`${BASE_URL}/quote`);
-  url.searchParams.append('from', params.from);
-  url.searchParams.append('to', params.to);
-  url.searchParams.append('amount', params.amount);
-  if (params.sender) url.searchParams.append('sender', params.sender);
-  if (params.excluded_protocols) url.searchParams.append('excluded_protocols', params.excluded_protocols);
-  if (params.max_slippage !== undefined) url.searchParams.append('max_slippage', params.max_slippage.toString());
-  if (params.deadline !== undefined) url.searchParams.append('deadline', params.deadline.toString());
-  if (params.max_hops !== undefined) url.searchParams.append('max_hops', params.max_hops.toString());
-  if (params.source) url.searchParams.append('source', params.source);
+  let url = `${BASE_URL}/quote`;
+  const search = new URLSearchParams(params as any).toString();
+  if (search) url += `?${search}`;
 
-  const res = await fetch(url.toString());
+  const res = await fetch(url);
   if (!res.ok) throw (await res.json()) as PathfinderErrorResponse;
   return res.json();
 }
