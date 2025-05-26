@@ -62,7 +62,7 @@ function BootScreen() {
     return (
       <div className="flex flex-col items-center justify-center h-screen w-screen bg-purple-900 text-white font-mono text-sm">
         <img src="/logo.png" alt="Boot Logo" className="w-20 h-20 mb-4" />
-        <p className="mb-2">MonToolsOS V1.0</p>
+        <p className="mb-2">MonToolsOS V1.1.0</p>
         <div className="w-64 h-3 bg-black border border-white">
           <div
             className="h-full bg-purple-500 transition-all duration-100 ease-linear"
