@@ -33,7 +33,7 @@ export default function ToolCard({
       <p
         className={clsx(
           "text-sm transition",
-          active ? "text-gray-400 group-hover:text-gray-300" : "text-gray-500"
+          active ? "text-violet-300 group-hover:text-violet-200" : "text-gray-500"
         )}
       >
         {description}
