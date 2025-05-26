@@ -1,6 +1,6 @@
 {
   "name": "monadic-tools",
-  "version": "0.1.0",
+  "version": "1.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
@@ -9,11 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@radix-ui/react-hover-card": "^1.1.14",
     "@reown/appkit": "^1.7.3",
     "@reown/appkit-adapter-wagmi": "^1.7.3",
     "@tanstack/react-query": "^5.74.11",
     "alchemy-sdk": "^3.5.8",
     "axios": "^1.9.0",
+    "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dotenv": "^16.5.0",
     "ethers": "^6.13.7",
@@ -23,6 +25,7 @@
     "merkletreejs": "^0.5.2",
     "motion": "^12.12.2",
     "next": "15.3.1",
+    "qss": "^3.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hot-toast": "^2.5.2",
@@ -43,6 +46,7 @@
     "eslint": "^9",
     "eslint-config-next": "15.3.1",
     "tailwindcss": "^4",
+    "tw-animate-css": "^1.3.0",
     "typescript": "^5"
   }
 }
