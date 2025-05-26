@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const BASE_URL = "https://testnet-api.monorail.xyz/v1";
+const BASE_URL = process.env.MONORAIL_DATA_URL;
 
 export async function GET(request: NextRequest, context: any) {
   const monorailPath = context?.params?.monorailPath;

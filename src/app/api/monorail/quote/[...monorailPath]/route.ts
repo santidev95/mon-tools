@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const BASE_URL = "https://testnet-pathfinder-v2.monorail.xyz/v3";
+const BASE_URL = process.env.MONORAIL_PATHFINDER_URL;
 
 export async function GET(request: NextRequest, context: any) {
   const monorailPath = context?.params?.monorailPath;
