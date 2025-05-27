@@ -41,9 +41,9 @@ export default function HomePage() {
           description="Bridge in Multichains"
           href="/portfolio"
           active={false}
-        />
+        />        
         <ToolCard
-          title="MonSwap"
+          title="Swap"
           description="Swap in tokens in Monad"
           href="/swap"
           active={true}
@@ -77,6 +77,13 @@ export default function HomePage() {
           description="Generate a merkle root and proofs"
           href="/merklegenerate"
           active={true}
+        />
+        <ToolCard
+          title="Monad Real-Time Transactions"
+          description="See the latest transactions on Monad"
+          href="https://monad-tx-viewer.vercel.app"
+          active={true}
+          blank={true}
         />
       </div>
     </main>

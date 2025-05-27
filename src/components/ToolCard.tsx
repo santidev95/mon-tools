@@ -6,6 +6,7 @@ interface ToolCardProps {
   title: string;
   description: string;
   href: string;
+  blank?: boolean;
   active?: boolean;
 }
 
@@ -14,6 +15,7 @@ export default function ToolCard({
   description,
   href,
   active = true,
+  blank = false,
 }: ToolCardProps) {
   const baseClasses = clsx(
     "border rounded-xl p-4 transition duration-200 shadow group",
@@ -40,9 +42,8 @@ export default function ToolCard({
       </p>
     </>
   );
-
   return active ? (
-    <Link href={href} className={baseClasses}>
+    <Link target={blank ? "_blank" : "_self"} href={href} className={baseClasses}>
       {content}
     </Link>
   ) : (
