@@ -12,7 +12,6 @@ import {
     CardTitle,
   } from "@/components/ui/card"
 import { ethers } from "ethers";
-import { Badge } from "lucide-react";
 import { Loader2 } from "lucide-react";
 
 // Tabs component
@@ -60,6 +59,7 @@ export default function PortfolioPage() {
                     setMonBalance(monBalance?.balance || "0");
                     setBalances(balances);
                     setLstBalances(balances.filter((balance) => balance.categories.includes("lst")));
+                    setMemeBalances(balances.filter((balance) => balance.categories.includes("meme")));
                 }
             } catch (err) {
                 console.error('Error fetching data:', err);
@@ -142,6 +142,7 @@ export default function PortfolioPage() {
                     {balances.length === 0 && <span className="text-zinc-400">No tokens found.</span>}
                 </div>
               )}
+
             </CardFooter>
           </Card>
         </div>
