@@ -27,7 +27,7 @@ export default function HomePage() {
           Click & Try MonTools OS 🚀
           </span>
         </button>
-        <span className="text-purple-400 text-sm">Explore a visual shell experience to navigate your tools faster</span>       
+        <span className="text-indigo-300 text-sm">Explore a visual shell experience to navigate your tools faster</span>       
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         <ToolCard
