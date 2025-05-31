@@ -34,12 +34,12 @@ export default function HomePage() {
           title="Your Portfolio (soon)"
           description="See your address portfolio"
           href="/portfolio"
-          active={false}
+          active={true}
         />
         <ToolCard
           title="MonBridge (soon)"
           description="Bridge in Multichains"
-          href="/portfolio"
+          href="/bridge"
           active={false}
         />        
         <ToolCard
