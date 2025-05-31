@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { usePublicClient, useAccount } from 'wagmi'
 import { LiaExternalLinkAltSolid } from "react-icons/lia";
 import {getWalletBalances, TokenBalance} from "../../lib/clients/monorail/dataApi";
@@ -12,6 +12,8 @@ import {
     CardTitle,
   } from "@/components/ui/card"
   import { Loader2 } from "lucide-react";
+import { fetchUserTokens, MagicEdenToken } from "@/lib/clients/magicEdenClient";
+import Image from "next/image";
 
 export default function PortfolioPage() {
     const { address } = useAccount();
@@ -23,6 +25,10 @@ export default function PortfolioPage() {
     const [memeBalances, setMemeBalances] = useState<TokenBalance[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [selectedMenu, setSelectedMenu] = useState<string>("Summary");
+    const [nfts, setNfts] = useState<MagicEdenToken[] | null>(null);
+    const [continuation, setContinuation] = useState<string | null>(null);
+    const [loadingMore, setLoadingMore] = useState<boolean>(false);
+    const loadMoreRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -50,6 +56,53 @@ export default function PortfolioPage() {
         fetchData();
     }, [publicClient, address]);
 
+    useEffect(() => {
+        const fetchNFTs = async () => {
+            if (address) {
+                const result = await fetchUserTokens(address);
+                if (result) {
+                    setNfts(result.tokens);
+                    setContinuation(result.continuation);
+                }
+            }
+        };
+
+        fetchNFTs();
+    }, [address]);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            async (entries) => {
+                const target = entries[0];
+                if (target.isIntersecting && continuation && !loadingMore && selectedMenu === "NFTs") {
+                    setLoadingMore(true);
+                    try {
+                        const result = await fetchUserTokens(address!, 20, continuation);
+                        if (result) {
+                            setNfts(prev => prev ? [...prev, ...result.tokens] : result.tokens);
+                            setContinuation(result.continuation);
+                        }
+                    } catch (error) {
+                        console.error('Error loading more NFTs:', error);
+                    } finally {
+                        setLoadingMore(false);
+                    }
+                }
+            },
+            { threshold: 1.0 }
+        );
+
+        if (loadMoreRef.current) {
+            observer.observe(loadMoreRef.current);
+        }
+
+        return () => {
+            if (loadMoreRef.current) {
+                observer.unobserve(loadMoreRef.current);
+            }
+        };
+    }, [continuation, loadingMore, address, selectedMenu]);
+
     if (!address) {
         return (
             <main>
@@ -73,32 +126,29 @@ export default function PortfolioPage() {
 
     // Menu options
     const menuOptions = [
-        { label: "Summary" },
-        { label: "Tokens" },
-        { label: "Staking" },
-        { label: "NFTs" },
+        { label: "Summary", text: "Portfolio Summary" },
+        { label: "Tokens", text: "Tokens Owned" },
+        { label: "Staking", text: "Staking Positions" },
+        { label: "NFTs", text: "NFTs" },
     ];
 
     return (
-        <main>
-            <div className="flex flex-row w-full justify-center mt-2 gap-6">
-                {/* Sidebar Menu */}
-                <aside className="hidden md:flex flex-col rounded-xl border border-white/10 bg-gradient-to-b from-purple-900/40 via-blue-900/30 to-blue-900/20 backdrop-blur-md p-4 min-w-[200px] max-w-[220px] h-fit ml-4 mt-0">
-                    <div className="flex flex-col items-center justify-center">
-                        <span className="text-indigo-300 text-lg font-semibold">Menu</span>
-                    </div>
-                    {menuOptions.map((option) => (
-                        <button
-                            key={option.label}
-                            className={`w-full text-left px-4 py-2 my-1 rounded-lg font-semibold transition-colors duration-200 text-zinc-200 hover:bg-purple-800/40 hover:text-purple-300 ${selectedMenu === option.label ? "bg-purple-800/60 text-purple-300" : ""}`}
-                            onClick={() => setSelectedMenu(option.label)}
-                        >
-                            {option.label}
-                        </button>
-                    ))}
-                </aside>
-                {/* Main Content */}
-                <div className="flex-1 flex flex-col items-center gap-6">
+        <main className="w-full flex flex-col items-center mt-2 gap-6">
+            {/* Horizontal Menu */}
+            <div className="flex flex-row gap-2 w-full max-w-2xl justify-center rounded-xl border border-white/10 bg-gradient-to-b from-purple-900/40 via-blue-900/30 to-blue-900/20 backdrop-blur-md p-4">
+                {menuOptions.map((option) => (
+                    <button
+                        key={option.label}
+                        className={`px-4 py-2 rounded-lg font-semibold transition-colors duration-200 text-zinc-200 hover:bg-purple-800/40 hover:text-purple-300 ${selectedMenu === option.label ? "bg-purple-800/60 text-purple-300" : ""}`}
+                        onClick={() => setSelectedMenu(option.label)}
+                    >
+                        {option.text}
+                    </button>
+                ))}
+            </div>
+            {/* Main Content */}
+            <div className="w-full flex justify-center">
+                <div className="w-full max-w-5xl flex flex-col items-center gap-6">
                     {selectedMenu === "Summary" && (
                         <>
                             {/* Portfolio Summary Card */}
@@ -136,7 +186,7 @@ export default function PortfolioPage() {
                     {selectedMenu === "Tokens" && (
                         <Card className="w-full max-w-5xl shadow-xl bg-zinc-900/50 backdrop-blur-sm border-purple-800/50">
                             <div className="flex flex-col items-center justify-center">
-                                <h1 className="text-xl font-bold text-purple-400 mb-4">Your Tokens</h1>
+                                <h1 className="text-xl font-bold text-purple-400 mb-4">Tokens Owned</h1>
                             </div>
                             <CardHeader>
                                 {balances.length > 0 ? (
@@ -194,7 +244,7 @@ export default function PortfolioPage() {
                     {selectedMenu === "Staking" && (
                         <Card className="w-full max-w-5xl shadow-xl bg-zinc-900/50 backdrop-blur-sm border-purple-800/50">
                             <div className="flex flex-col items-center justify-center">
-                                <h1 className="text-xl font-bold text-purple-400 mb-4">Your Staking Positions</h1>
+                                <h1 className="text-xl font-bold text-purple-400 mb-4">Staking Positions</h1>
                             </div>
                             <CardHeader>
                                 {lstBalances.length > 0 ? (
@@ -233,12 +283,82 @@ export default function PortfolioPage() {
                         </Card>
                     )}
                     {selectedMenu === "NFTs" && (
-                        <Card className="w-full max-w-3xl shadow-xl bg-zinc-900/50 backdrop-blur-sm border-purple-800/50">
+                        <Card className="w-full max-w-5xl shadow-xl bg-zinc-900/50 backdrop-blur-sm border-purple-800/50">
                             <div className="flex flex-col items-center justify-center">
                                 <h1 className="text-xl font-bold text-purple-400 mb-4">NFTs</h1>
                             </div>
                             <CardHeader>
-                                <span className="text-zinc-400">NFTs feature coming soon.</span>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    {nfts?.map((nft) => (
+                                        <Card key={`${nft.token.contract}-${nft.token.tokenId}`} className="bg-zinc-800/50 border-purple-800/30">
+                                            <CardHeader className="p-4">
+                                                <div className="w-[200px] h-[200px] mx-auto relative overflow-hidden rounded-lg aspect-square">
+                                                    {nft.token.image ? (
+                                                        <Image
+                                                            src={nft.token.image}
+                                                            alt={nft.token.name}
+                                                            fill
+                                                            className="object-cover"
+                                                        />
+                                                    ) : nft.token.media ? (
+                                                        nft.token.media.type === 'video' ? (
+                                                            <video
+                                                                src={nft.token.media.url}
+                                                                className="w-full h-full object-cover"
+                                                                controls
+                                                                loop
+                                                                muted
+                                                            />
+                                                        ) : (
+                                                            <Image
+                                                                src={nft.token.media.url}
+                                                                alt={nft.token.name}
+                                                                fill
+                                                                className="object-cover"
+                                                            />
+                                                        )
+                                                    ) : (
+                                                        <div className="w-full h-full flex items-center justify-center bg-zinc-900">
+                                                            <span className="text-zinc-600">No media</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="mt-4">
+                                                    <h3 className="text-sm font-semibold text-purple-400 truncate">
+                                                        {nft.token.name}
+                                                    </h3>
+                                                    <p className="text-xs text-zinc-400 mt-1">
+                                                        {nft.token.collection.name}
+                                                    </p>
+                                                    {nft.token.collection.floorAskPrice && (
+                                                        <p className="text-xs text-zinc-400 mt-1">
+                                                            Floor: {nft.token.collection.floorAskPrice.amount.decimal} {nft.token.collection.floorAskPrice.currency.symbol}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            </CardHeader>
+                                        </Card>
+                                    ))}
+                                </div>
+                                {!nfts && (
+                                    <div className="text-center py-8">
+                                        <p className="text-zinc-400">Loading NFTs...</p>
+                                    </div>
+                                )}
+                                {nfts?.length === 0 && (
+                                    <div className="text-center py-8">
+                                        <p className="text-zinc-400">No NFTs found.</p>
+                                    </div>
+                                )}
+                                {continuation && (
+                                    <div ref={loadMoreRef} className="h-10 flex items-center justify-center">
+                                        {loadingMore ? (
+                                            <Loader2 className="animate-spin text-purple-400 w-6 h-6" />
+                                        ) : (
+                                            <span className="text-zinc-400">Scroll for more</span>
+                                        )}
+                                    </div>
+                                )}
                             </CardHeader>
                         </Card>
                     )}

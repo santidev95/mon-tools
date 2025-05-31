@@ -17,7 +17,7 @@ export default function LayoutClient({ children, cookies }: { children: React.Re
     <ContextProvider cookies={cookies}>
       <div className={`relative flex flex-col min-h-screen ${gradientBg}`}>
         {!hideNavAndFooter && <Navbar />}
-        <main>{children}</main>
+        <main className="pb-16">{children}</main>
         <Toaster position="bottom-center" />
         {!hideNavAndFooter && (
           <footer className="w-full text-center text-sm py-2 absolute bottom-0">

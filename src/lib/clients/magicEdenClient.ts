@@ -71,6 +71,83 @@ export interface UserCollection {
   };
 }
 
+export interface MagicEdenToken {
+  token: {
+    chainId: number;
+    contract: string;
+    tokenId: string;
+    kind: string;
+    name: string;
+    image: string;
+    imageSmall: string;
+    imageLarge: string;
+    metadata: {
+      imageOriginal: string;
+      imageMimeType: string;
+    };
+    description: string;
+    rarityScore: number | null;
+    rarityRank: number | null;
+    supply: string;
+    remainingSupply: string;
+    media: any | null;
+    isFlagged: boolean;
+    isSpam: boolean;
+    metadataDisabled: boolean;
+    lastFlagUpdate: string | null;
+    lastFlagChange: string | null;
+    collection: {
+      id: string;
+      name: string;
+      slug: string | null;
+      symbol: string | null;
+      imageUrl: string;
+      isSpam: boolean;
+      metadataDisabled: boolean;
+      openseaVerificationStatus: string | null;
+      floorAskPrice: {
+        currency: {
+          contract: string;
+          name: string;
+          symbol: string;
+          decimals: number;
+        };
+        amount: {
+          raw: string;
+          decimal: number;
+          usd: number | null;
+          native: number;
+        };
+      };
+      royaltiesBps: number;
+      royalties: Array<{
+        bps: number;
+        recipient: string;
+      }>;
+    };
+    lastAppraisalValue: number | null;
+  };
+  ownership: {
+    tokenCount: string;
+    onSaleCount: string;
+    floorAsk: {
+      id: string | null;
+      price: any | null;
+      maker: string | null;
+      kind: string | null;
+      validFrom: string | null;
+      validUntil: string | null;
+      source: string | null;
+    };
+    acquiredAt: string;
+  };
+}
+
+export interface UserTokensResponse {
+  tokens: MagicEdenToken[];
+  continuation: string | null;
+}
+
 export async function fetchMagicEdenCollection(contract: string): Promise<MagicEdenCollection | null> {
   const url = `${API_URL}?contract=${contract}&includeMintStages=true&includeSecurityConfigs=true`;
 
@@ -124,4 +201,52 @@ export async function fetchUserCollectionByContract(
   const data = await response.json();
   const result = data.collections?.[0] ?? null;
   return result;
+}
+
+/**
+ * Fetches tokens owned by a wallet with pagination support.
+ * @param wallet Wallet address
+ * @param limit Number of tokens to fetch (default: 1)
+ * @param continuation Continuation token for pagination
+ * @returns List of tokens and continuation token
+ */
+export async function fetchUserTokens(
+  wallet: string,
+  limit: number = 20,
+  continuation?: string
+): Promise<UserTokensResponse | null> {
+  const baseUrl = `https://api-mainnet.magiceden.dev/v3/rtp/monad-testnet/users/${wallet}/tokens/v7`;
+  const params = new URLSearchParams({
+    normalizeRoyalties: "false",
+    sortBy: "acquiredAt",
+    sortDirection: "desc",
+    limit: limit.toString(),
+    includeTopBid: "false",
+    includeAttributes: "false",
+    includeLastSale: "false",
+    includeRawData: "false",
+    filterSpamTokens: "true",
+    useNonFlaggedFloorAsk: "false",
+  });
+
+  if (continuation) {
+    params.append("continuation", continuation);
+  }
+
+  const url = `${baseUrl}?${params.toString()}`;
+
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      Accept: "*/*",
+      Authorization: `Bearer ${API_KEY}`,
+    },
+  });
+
+  if (!response.ok) {
+    console.warn("Magic Eden user tokens API error:", response.status);
+    return null;
+  }
+
+  return response.json();
 }
