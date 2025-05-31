@@ -22,7 +22,7 @@ export default function PortfolioPage() {
     const [lstBalances, setLstBalances] = useState<TokenBalance[]>([]);
     const [memeBalances, setMemeBalances] = useState<TokenBalance[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
-    const [selectedMenu, setSelectedMenu] = useState<string>("Resumo");
+    const [selectedMenu, setSelectedMenu] = useState<string>("Summary");
 
     useEffect(() => {
         const fetchData = async () => {
