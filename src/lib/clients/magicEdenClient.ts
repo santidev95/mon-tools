@@ -215,38 +215,28 @@ export async function fetchUserTokens(
   limit: number = 20,
   continuation?: string
 ): Promise<UserTokensResponse | null> {
-  const baseUrl = `https://api-mainnet.magiceden.dev/v3/rtp/monad-testnet/users/${wallet}/tokens/v7`;
   const params = new URLSearchParams({
-    normalizeRoyalties: "false",
-    sortBy: "acquiredAt",
-    sortDirection: "desc",
+    wallet,
     limit: limit.toString(),
-    includeTopBid: "false",
-    includeAttributes: "false",
-    includeLastSale: "false",
-    includeRawData: "false",
-    filterSpamTokens: "true",
-    useNonFlaggedFloorAsk: "false",
   });
 
   if (continuation) {
     params.append("continuation", continuation);
   }
 
-  const url = `${baseUrl}?${params.toString()}`;
+  const url = `/api/magiceden/user-tokens?${params.toString()}`;
 
-  const response = await fetch(url, {
-    method: "GET",
-    headers: {
-      Accept: "*/*",
-      Authorization: `Bearer ${API_KEY}`,
-    },
-  });
+  try {
+    const response = await fetch(url);
 
-  if (!response.ok) {
-    console.warn("Magic Eden user tokens API error:", response.status);
+    if (!response.ok) {
+      console.warn("Magic Eden user tokens API error:", response.status);
+      return null;
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error("Error fetching user tokens:", error);
     return null;
   }
-
-  return response.json();
 }
