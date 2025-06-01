@@ -1,11 +1,12 @@
 import React from 'react';
 import Image from "next/image";
-import { Loader2 } from "lucide-react";
+import { Loader2, ExternalLink } from "lucide-react";
 import {
     Card,
     CardHeader,
 } from "@/components/ui/card";
 import { MagicEdenToken } from "@/lib/clients/magicEdenClient";
+import Link from "next/link";
 
 interface NFTsCardProps {
     nfts: MagicEdenToken[] | null;
@@ -23,7 +24,7 @@ export function NFTsCard({ nfts, continuation, loadingMore, loadMoreRef }: NFTsC
             <CardHeader>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {nfts?.map((nft) => (
-                        <Card key={`${nft.token.contract}-${nft.token.tokenId}`} className="bg-zinc-800/50 border-purple-800/30">
+                        <Card key={`${nft.token.contract}-${nft.token.tokenId}`} className="bg-zinc-800/50 border-purple-800/30 group relative">
                             <CardHeader className="p-4">
                                 <div className="w-[200px] h-[200px] mx-auto relative overflow-hidden rounded-lg aspect-square">
                                     {nft.token.image ? (
@@ -31,7 +32,7 @@ export function NFTsCard({ nfts, continuation, loadingMore, loadMoreRef }: NFTsC
                                             src={nft.token.image}
                                             alt={nft.token.name}
                                             fill
-                                            className="object-cover"
+                                            className="object-cover transition-transform group-hover:scale-110"
                                         />
                                     ) : nft.token.media ? (
                                         nft.token.media.toLowerCase().endsWith('.mp4') ? (
@@ -41,13 +42,15 @@ export function NFTsCard({ nfts, continuation, loadingMore, loadMoreRef }: NFTsC
                                                 controls
                                                 loop
                                                 muted
+                                                autoPlay
+                                                playsInline
                                             />
                                         ) : (
                                             <Image
-                                                src={nft.token.media.url}
+                                                src={nft.token.media}
                                                 alt={nft.token.name}
                                                 fill
-                                                className="object-cover"
+                                                className="object-cover transition-transform group-hover:scale-110"
                                             />
                                         )
                                     ) : (
@@ -55,6 +58,25 @@ export function NFTsCard({ nfts, continuation, loadingMore, loadMoreRef }: NFTsC
                                             <span className="text-zinc-600">No media</span>
                                         </div>
                                     )}
+                                    <div className="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center p-4">
+                                        <h3 className="text-white font-bold text-center mb-2 drop-shadow-md" style={{textShadow: '0 2px 8px #000, 0 0px 2px #000'}}>{nft.token.name}</h3>
+                                        <p className="text-white/80 text-sm text-center mb-4 drop-shadow-md" style={{textShadow: '0 2px 8px #000, 0 0px 2px #000'}}>{nft.token.collection.name}</p>
+                                        {nft.token.collection.floorAskPrice && (
+                                            <p className="text-white/80 text-sm mb-4 drop-shadow-md" style={{textShadow: '0 2px 8px #000, 0 0px 2px #000'}}>
+                                                Floor: {nft.token.collection.floorAskPrice.amount.decimal} {nft.token.collection.floorAskPrice.currency.symbol}
+                                            </p>
+                                        )}
+                                        <Link 
+                                            href={`https://magiceden.io/collections/monad-testnet/${nft.token.contract}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex items-center gap-2 text-purple-400 hover:text-purple-300 transition-colors drop-shadow-md"
+                                            style={{textShadow: '0 2px 8px #000, 0 0px 2px #000'}}
+                                        >
+                                            <span>View on Magic Eden</span>
+                                            <ExternalLink className="w-4 h-4" />
+                                        </Link>
+                                    </div>
                                 </div>
                                 <div className="mt-4">
                                     <h3 className="text-sm font-semibold text-purple-400 truncate">
