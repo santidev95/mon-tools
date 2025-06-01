@@ -9,6 +9,7 @@ import { SummaryCard } from "./components/SummaryCard";
 import { TokensCard } from "./components/TokensCard";
 import { StakingCard } from "./components/StakingCard";
 import { NFTsCard } from "./components/NFTsCard";
+import { DomainsCard } from "./components/DomainsCard";
 
 export default function PortfolioPage() {
     const { address } = useAccount();
@@ -125,12 +126,13 @@ export default function PortfolioPage() {
         { label: "Tokens", text: "Tokens Owned" },
         { label: "Staking", text: "Staking Positions" },
         { label: "NFTs", text: "NFTs" },
+        { label: "Domains", text: "Domains" },
     ];
 
     return (
         <main className="w-full flex flex-col items-center mt-2 gap-6">
             {/* Horizontal Menu */}
-            <div className="flex flex-row gap-2 w-full max-w-2xl justify-center rounded-xl border border-white/10 bg-gradient-to-b from-purple-900/40 via-blue-900/30 to-blue-900/20 backdrop-blur-md p-4">
+            <div className="flex flex-row gap-2 w-full max-w-3xl justify-center rounded-xl border border-white/10 bg-gradient-to-b from-purple-900/40 via-blue-900/30 to-blue-900/20 backdrop-blur-md p-4">
                 {menuOptions.map((option) => (
                     <button
                         key={option.label}
@@ -165,6 +167,9 @@ export default function PortfolioPage() {
                             loadingMore={loadingMore}
                             loadMoreRef={loadMoreRef}
                         />
+                    )}
+                    {selectedMenu === "Domains" && (
+                        <DomainsCard />
                     )}
                 </div>
             </div>
