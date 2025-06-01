@@ -9,10 +9,8 @@ import { SummaryCard } from "./components/SummaryCard";
 import { TokensCard } from "./components/TokensCard";
 import { StakingCard } from "./components/StakingCard";
 import { NFTsCard } from "./components/NFTsCard";
-<<<<<<< HEAD
 import { DomainsCard } from "./components/DomainsCard";
-=======
->>>>>>> master
+
 
 export default function PortfolioPage() {
     const { address } = useAccount();
@@ -170,12 +168,10 @@ export default function PortfolioPage() {
                             loadingMore={loadingMore}
                             loadMoreRef={loadMoreRef}
                         />
-<<<<<<< HEAD
                     )}
                     {selectedMenu === "Domains" && (
                         <DomainsCard />
-=======
->>>>>>> master
+
                     )}
                 </div>
             </div>
