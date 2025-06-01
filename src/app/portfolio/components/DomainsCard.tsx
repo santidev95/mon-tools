@@ -68,22 +68,25 @@ export function DomainsCard() {
       {domains.length === 0 ? (
         <p className="text-zinc-400">No domains found</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {domains.map((domain) => (
-            <div
-              key={domain.domain_name + domain.tld}
-              className="p-4 rounded-lg bg-white/5 border border-white/10 hover:border-purple-500/50 transition-colors"
-            >
-              <h3 className="text-lg font-medium text-purple-300">{domain.domain_name}{domain.tld}</h3>
-              <p className="text-sm text-zinc-400 mt-1">
-                Expires: {new Date(parseInt(domain.expires_at) * 1000).toLocaleDateString()}
-              </p>
-              {domain.transferrable && (
-                <p className="text-sm text-green-400 mt-1">Transferrable</p>
-              )}
+        <><div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {domains.map((domain) => (
+              <div
+                key={domain.domain_name + domain.tld}
+                className="p-4 rounded-lg bg-white/5 border border-white/10 hover:border-purple-500/50 transition-colors"
+              >
+                <h3 className="text-lg font-medium text-purple-300">{domain.domain_name}{domain.tld}</h3>
+                <p className="text-sm text-zinc-400 mt-1">
+                  Expires: {new Date(parseInt(domain.expires_at) * 1000).toLocaleDateString()}
+                </p>
+                {domain.transferrable && (
+                  <p className="text-sm text-green-400 mt-1">Transferrable</p>
+                )}
+              </div>
+            ))}
+          </div><div className="flex flex-col items-center justify-center">
+              <span className="text-sm text-center text-purple-400 mt-4">data by <a href="https://alldomains.id/" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:text-purple-300">AllDomains</a></span>
             </div>
-          ))}
-        </div>
+            </>
       )}
     </div>
   );
