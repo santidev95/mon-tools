@@ -1,101 +1,58 @@
 import { useEffect, useState } from "react";
-import { useAccount, useWalletClient } from "wagmi";
-import {
-  createPublicClient,
-  getContract,
-  formatUnits,
-  http,
-} from "viem";
-import { monadTestnet } from "viem/chains";
-
-const publicClient = createPublicClient({
-  chain: monadTestnet,
-  transport: http(process.env.ALCHEMY_URL),
-});
-
-const ERC20_ABI = [
-  {
-    name: "balanceOf",
-    type: "function",
-    stateMutability: "view",
-    inputs: [{ name: "account", type: "address" }],
-    outputs: [{ type: "uint256" }],
-  },
-];
+import { useAccount } from "wagmi";
+import { formatUnits } from "viem";
 
 export interface TokenBalance {
+  id: string;
   address: `0x${string}` | "native";
   name: string;
   symbol: string;
   decimals: number;
-  formattedBalance: string;
+  balance: string;
+  categories: string[];
+  mon_per_token: string;
+  pconf: string;
+  formattedBalance?: string;
 }
 
-export function useTokenBalances(tokenContracts: `0x${string}`[]) {
+export function useTokenBalances() {
   const { address } = useAccount();
-  const { data: walletClient } = useWalletClient();
-
   const [tokens, setTokens] = useState<TokenBalance[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!address || !walletClient) return;
+    if (!address) return;
 
     const load = async () => {
       setLoading(true);
-      const result: TokenBalance[] = [];
-
       try {
-        const monBalance = await publicClient.getBalance({ address });
-        if (monBalance > 0n) {
-          result.push({
-            address: "native",
-            name: "Monad",
-            symbol: "MON",
-            decimals: 18,
-            formattedBalance: formatUnits(monBalance, 18),
-          });
+        const response = await fetch(`/api/monorail/data/wallet/${address}/balances`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch balances");
         }
+
+        const data = await response.json();
+        // Add formattedBalance to each token
+        const formattedData = data.map((token: TokenBalance) => {
+          // Convert decimal balance to integer by multiplying by 10^decimals
+          const balanceFloat = parseFloat(token.balance);
+          const balanceInt = BigInt(Math.floor(balanceFloat * Math.pow(10, token.decimals)));
+          
+          return {
+            ...token,
+            formattedBalance: formatUnits(balanceInt, token.decimals)
+          };
+        });
+        setTokens(formattedData);
       } catch (err) {
-        console.warn("Error reading MON balance:", err);
+        console.error("Error loading token balances:", err);
+      } finally {
+        setLoading(false);
       }
-
-      for (const tokenAddress of tokenContracts) {
-        try {
-          const contract = getContract({
-            address: tokenAddress,
-            abi: ERC20_ABI,
-            client: publicClient,
-          });
-
-          const balance = await contract.read.balanceOf([address]) as bigint;
-          if (balance === 0n) continue;
-
-          console.log("tokenAddress",tokenAddress);
-          const res = await fetch(`/api/token-meta/${tokenAddress}`);
-          console.log("red",res);
-          if (!res.ok) throw new Error("Failed to fetch metadata");
-
-          const { name, symbol, decimals } = await res.json();
-
-          result.push({
-            address: tokenAddress,
-            name,
-            symbol,
-            decimals,
-            formattedBalance: formatUnits(balance, decimals),
-          });
-        } catch (err) {
-          console.warn(`Error loading metadata for ${tokenAddress}:`, err);
-        }
-      }
-
-      setTokens(result);
-      setLoading(false);
     };
 
     load();
-  }, [address, walletClient, tokenContracts]);
+  }, [address]);
 
   return { tokens, loading };
 }

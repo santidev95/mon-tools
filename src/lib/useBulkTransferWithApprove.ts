@@ -44,15 +44,17 @@ export function useBulkTransferWithApprove() {
 
     if (token === "native") {
       const parsedAmount = parseEther(amountEach);
+      const txHashes: string[] = [];
 
       for (const to of recipients) {
-        await walletClient.sendTransaction({
+        const tx = await walletClient.sendTransaction({
           to: to as `0x${string}`,
           value: parsedAmount,
         });
+        txHashes.push(tx);
       }
 
-      return;
+      return txHashes;
     }
 
     const parsedAmount = parseUnits(amountEach, decimals);
@@ -70,12 +72,13 @@ export function useBulkTransferWithApprove() {
     await publicClient.waitForTransactionReceipt({ hash: approveHash });
 
     // Step 2: batchTransfer
-    await walletClient.writeContract({
+    const batchTransferHash = await walletClient.writeContract({
       address: BULK_TRANSFER_ADDRESS,
       abi: BULK_TRANSFER_ABI,
       functionName: "batchTransfer",
       args: [token, recipients as `0x${string}`[], parsedAmount],
     });
+    return batchTransferHash;
   };
 
   return { execute };
