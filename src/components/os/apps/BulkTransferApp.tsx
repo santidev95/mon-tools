@@ -10,19 +10,6 @@ import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
 import { isAddress } from "ethers";
 import { allDomainsClient } from "@/lib/clients/allDomains";
 
-const tokenList = [
-  "0x760AfE86e5de5fa0Ee542fc7B7B713e1c5425701",
-  "0xaEef2f6B429Cb59C9B2D7bB2141ADa993E8571c3",
-  "0x3a98250F98Dd388C211206983453837C8365BDc1",
-  "0xe1d2439b75fb9746E7Bc6cB777Ae10AA7f7ef9c5",
-  "0x268E4E24E0051EC27b3D27A95977E71cE6875a05",
-  "0xf817257fed379853cDe0fa4F97AB987181B1E5Ea",
-  "0x88b8E2161DEDC77EF4ab7585569D2415a1C1055D",
-  "0xB5a30b0FDc5EA94A52fDc42e3E9760Cb8449Fb37",
-  "0xA296f47E8Ff895Ed7A092b4a9498bb13C46ac768",
-  "0x0C0c92FcF37Ae2CBCc512e59714Cd3a1A1cbc411",
-  "0x8507F576EB214d172012065d58cfb38a4540b0a6",
-] as `0x${string}`[];
 
 export default function BulkTransferApp() {
   const [tokenAddress, setTokenAddress] = useState<"" | `0x${string}` | "native">("");

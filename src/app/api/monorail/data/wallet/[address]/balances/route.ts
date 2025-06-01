@@ -2,11 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 
 const BASE_URL = process.env.MONORAIL_DATA_URL;
 
-export async function GET(
-  request: NextRequest,
-  context: { params: { address: string } }
-) {
-  const address = context.params.address;
+export async function GET(request: NextRequest, context: any) {
+  const address = context?.params?.address;
   
   if (!address) {
     return NextResponse.json(
