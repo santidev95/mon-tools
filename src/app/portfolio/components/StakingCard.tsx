@@ -7,6 +7,7 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { TokenBalance } from "@/lib/clients/monorail/dataApi";
+import { TbWorld } from "react-icons/tb";
 
 interface StakingCardProps {
     lstBalances: TokenBalance[];
@@ -31,6 +32,19 @@ export function StakingCard({ lstBalances }: StakingCardProps) {
                                         <CardDescription className="text-zinc-400">
                                             {balance.symbol}
                                         </CardDescription>
+                                        <div className="flex items-center gap-2">
+                                        <a 
+                                            href={
+                                                balance.symbol?.toLowerCase().includes('gmon') ? 'https://www.magmastaking.xyz/' :
+                                                balance.symbol?.toLowerCase().includes('aprmon') ? 'https://stake.apr.io/' :
+                                                balance.symbol?.toLowerCase().includes('shmon') ? 'https://shmonad.xyz/' :
+                                                ''
+                                            }
+                                            target="_blank"
+                                            className="text-purple-400 hover:text-purple-300"
+                                        >
+                                            <TbWorld className="w-4 h-4" />
+                                        </a> 
                                         {balance.address && (
                                             <a 
                                                 href={`https://testnet.monadexplorer.com/token/${balance.address}`} 
@@ -38,8 +52,9 @@ export function StakingCard({ lstBalances }: StakingCardProps) {
                                                 className="text-purple-400 hover:text-purple-300"
                                             >
                                                 <LiaExternalLinkAltSolid className="w-4 h-4" />
-                                            </a>
-                                        )}
+                                            </a>                                            
+                                        )}                                        
+                                        </div>                                       
                                     </div>
                                     <CardTitle className="text-2xl font-semibold tabular-nums break-all text-purple-400 mt-2">
                                         {parseFloat(balance.balance).toLocaleString("en-US", { maximumFractionDigits: 3 })}
