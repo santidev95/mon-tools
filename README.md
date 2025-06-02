@@ -1,6 +1,6 @@
 # MonTools
 
-MonTools  is a modern, modular web application providing a suite of utilities for interacting with tokens and NFTs on EVM-compatible blockchains. It features a unique desktop-like interface (MonTools OS) for seamless navigation between tools, as well as traditional web navigation.
+MonTools is a modern, modular open source web application providing a suite of utilities for interacting with tokens and NFTs on EVM-compatible blockchains. It features a unique desktop-like interface (MonTools OS) for seamless navigation between tools, as well as traditional web navigation.
 
 ## Features
 
@@ -10,6 +10,17 @@ MonTools  is a modern, modular web application providing a suite of utilities fo
 - **NFT Inspector**: View details of any NFT collection and check if your connected wallet is a holder.
 - **Token Bulk Transfer**: Send a specified amount of a token to multiple addresses in a single operation.
 - **Merkle Root Generator**: Generate a Merkle root and proofs from a list of addresses, with downloadable proofs.
+- **Portfolio Viewer**: Comprehensive portfolio management with token balances, NFT collections, staking positions, and domain names.
+
+## Tech Stack
+
+- **Framework**: Next.js 15.3.1 with React 19
+- **Styling**: Tailwind CSS 4 with custom animations
+- **State Management**: TanStack Query (React Query)
+- **Web3**: Wagmi v2, Viem, Ethers.js
+- **UI Components**: Headless UI, Radix UI
+- **Animations**: Framer Motion
+- **Development**: TypeScript, ESLint, Turbopack
 
 ## Deployed Version
 ### Access here: https://montools.xyz
@@ -19,6 +30,7 @@ MonTools  is a modern, modular web application providing a suite of utilities fo
 ### Prerequisites
 - Node.js (v18+ recommended)
 - npm or yarn
+- Redis (for caching and session management)
 
 ### Installation
 
@@ -27,13 +39,25 @@ MonTools  is a modern, modular web application providing a suite of utilities fo
    git clone <repo-url>
    cd monadic-tools
    ```
+
 2. Install dependencies:
    ```bash
    npm install
    # or
    yarn install
    ```
-3. Create a `.env.local` file, use `env.example` for environment variables as needed.
+
+3. Set up environment variables:
+   - Copy `env.example` to `.env.local`
+   - Fill in the required environment variables:
+     ```
+     ALCHEMY_URL=''                    # Your Alchemy API URL
+     REDIS_URL=redis://localhost:6379  # Redis connection URL
+     MONORAIL_DATA_URL=""             # Monorail API URL
+     MONORAIL_PATHFINDER_URL=""       # Monorail Pathfinder URL
+     NEXT_PUBLIC_REOWN_PROJECT_ID=''  # Reown project ID
+     NEXT_PUBLIC_USE_OS_LAYOUT=false  # Toggle OS layout
+     ```
 
 ### Running Locally
 
@@ -79,6 +103,28 @@ Visit [http://localhost:3000](http://localhost:3000) in your browser.
 - Paste a list of addresses, generate a Merkle root and proofs.
 - Download proofs as a JSON file for airdrops or allowlist use.
 
+### Portfolio Viewer
+- **Summary Dashboard**: View your total MON balance, transaction count, token holdings, and staking positions at a glance
+- **Token Management**: 
+  - Categorized view of all your token holdings
+  - Real-time balance updates
+  - Direct links to token explorers
+  - Support for native and custom tokens
+- **Staking Overview**:
+  - Track all your staking positions
+  - View staked amounts for different protocols
+  - Quick access to staking platforms
+- **NFT Gallery**:
+  - Browse your NFT collections
+  - View floor prices and collection details
+  - Direct links to Magic Eden listings
+  - Infinite scroll for large collections
+- **Domain Management**:
+  - View all your registered domains
+  - Check expiration dates
+  - Verify transferability status
+  - Integration with AllDomains
+
 ## MonTools OS
 
 - Launch from the homepage or `/os`.
@@ -87,29 +133,34 @@ Visit [http://localhost:3000](http://localhost:3000) in your browser.
 - Boot animations for immersion.
 - Each tool runs in its own window, allowing multitasking.
 
-## UI/UX
+## Development
 
-- Responsive, dark-themed interface using Tailwind CSS.
-- ToolCard components for modular tool navigation.
-- Framer Motion for smooth animations.
-- Google Fonts (Geist Sans, Geist Mono) for a modern look.
+### Available Scripts
 
-## Extensibility
+- `npm run dev` - Start development server with Turbopack
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
 
-- Easily add new tools by creating a new page and ToolCard.
-- Modular structure: API routes and UI components are easy to extend for new blockchain utilities.
+### Project Structure
 
-## Roadmap
-
-- Portfolio viewer (coming soon)
-- Multi-chain bridge (coming soon)
-- More advanced analytics and dashboards
+```
+mon-tools/
+├── src/              # Source code
+├── public/           # Static assets
+├── components/       # React components
+├── pages/           # Next.js pages
+├── styles/          # Global styles
+└── utils/           # Utility functions
+```
 
 ## Contributing
 
-1. Fork the repo and create your feature branch.
-2. Commit your changes.
-3. Push to the branch and open a pull request.
+1. Fork the repo and create your feature branch
+2. Install dependencies and set up environment variables
+3. Make your changes
+4. Run tests and ensure linting passes
+5. Submit a pull request
 
 ## License
 
