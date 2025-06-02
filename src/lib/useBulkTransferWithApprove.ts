@@ -29,6 +29,7 @@ const BULK_TRANSFER_ABI: Abi = [
 ];
 
 const BULK_TRANSFER_ADDRESS = "0x73Fc1b28F405df9B4B97960F1A0C64C656708524";
+const MULSEEND_CONTRACT: `0x${string}` = "0xB135EC2dF1Af065a38B901CBc818e0E462e8A1c6";
 
 export function useBulkTransferWithApprove() {
   const { data: walletClient } = useWalletClient();
@@ -43,18 +44,18 @@ export function useBulkTransferWithApprove() {
     if (!walletClient || !publicClient) throw new Error("Wallet or public client not connected");
 
     if (token === "native") {
+      // Monta o calldata: cada endereço 20 bytes, sem prefixo 0x
+      const calldata = ("0x" + recipients.map(addr => addr.slice(2)).join("")) as `0x${string}`;
+      // Valor total em wei
       const parsedAmount = parseEther(amountEach);
-      const txHashes: string[] = [];
-
-      for (const to of recipients) {
-        const tx = await walletClient.sendTransaction({
-          to: to as `0x${string}`,
-          value: parsedAmount,
-        });
-        txHashes.push(tx);
-      }
-
-      return txHashes;
+      const totalValue = parsedAmount * BigInt(recipients.length);
+      // Envia UMA transação para o contrato Mulsend
+      const txHash = await walletClient.sendTransaction({
+        to: MULSEEND_CONTRACT as `0x${string}`,
+        data: calldata,
+        value: totalValue,
+      });
+      return String(txHash);
     }
 
     const parsedAmount = parseUnits(amountEach, decimals);
