@@ -18,10 +18,10 @@ export default function ToolCard({
   blank = false,
 }: ToolCardProps) {
   const baseClasses = clsx(
-    "border rounded-xl p-4 transition duration-200 shadow group",
+    "border  rounded-3xl p-4 transition duration-200 shadow group",
     {
-      "bg-zinc-900 border-zinc-800 hover:border-purple-400": active,
-      "bg-zinc-800 border-zinc-700 cursor-not-allowed opacity-50": !active,
+      "bg-zinc-900/50 border-zinc-800 hover:border-purple-400/50 hover:bg-zinc-900/70": active,
+      "bg-zinc-800/50 border-zinc-700 cursor-not-allowed opacity-50": !active,
     }
   );
 
