@@ -12,36 +12,21 @@ export default function Navbar() {
   return (
     <nav className="bg-zinc-950 text-gray-200 px-6 py-2 shadow-md">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        {/* Logo compacta + nome (opcional) */}
+        {/* Logo + nome (texto visível apenas no desktop) */}
         <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center gap-2">
-          <Image src="/logo.png" alt="Logo" width={65} height={65} />
-          <span className="text-base font-bold text-violet-400 font-mono">
-            MonTools
-          </span>
+            <Image src="/logo.png" alt="Logo" width={65} height={65} />
+            <span className="hidden md:inline text-base font-bold text-violet-400 font-mono">
+              MonTools
+            </span>
           </Link>
         </div>
 
-        {/* Menu desktop */}
-        <div className="hidden md:flex items-center space-x-4">
+        {/* Connect button - now visible on both mobile and desktop */}
+        <div className="flex items-center">
           <ConnectButton />
         </div>
-
-        {/* Botão mobile */}
-        <button
-          className="md:hidden text-purple-400"
-          onClick={() => setIsOpen(!isOpen)}
-        >
-          {isOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
       </div>
-
-      {/* Menu mobile */}
-      {isOpen && (
-        <div className="md:hidden mt-3 space-y-2">
-          <ConnectButton />
-        </div>
-      )}
     </nav>
   );
 }
