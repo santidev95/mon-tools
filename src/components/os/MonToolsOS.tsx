@@ -95,7 +95,7 @@ export default function MonToolsOS({ backgroundImage = "/back.png" }: MonToolsOS
         <OSWindow
           title="Bulk Transfer"
           onClose={() => closeApp("bulktransfer")}
-          defaultSize={{ width: 400, height: 520 }}
+          defaultSize={{ width: 800, height: 750 }}
         >
           <BulkTransferApp />
         </OSWindow>
