@@ -299,6 +299,16 @@ export default function BulkTransferPage() {
           <LiaExternalLinkAltSolid className="w-4 h-4" />
       </a>  
       </div>
+      <div className="flex justify-center gap-2">
+      <label className="text-sm text-gray-400">Native MultiSend Contract: 0xB135EC2dF1Af065a38B901CBc818e0E462e8A1c6 </label>
+      <a 
+          href="https://testnet.monadexplorer.com/address/0xB135EC2dF1Af065a38B901CBc818e0E462e8A1c6" 
+          target="_blank"
+          className="text-purple-400 hover:text-purple-300"
+      >
+          <LiaExternalLinkAltSolid className="w-4 h-4" />
+      </a>  
+      </div>
       {status && <p className="mt-4 text-sm text-center">{status}</p>}
     </div>
   );
