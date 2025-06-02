@@ -63,7 +63,7 @@ export function DomainsCard() {
   }
 
   return (
-    <div className="w-full rounded-xl border border-white/10 bg-gradient-to-b from-purple-900/40 via-blue-900/30 to-blue-900/20 backdrop-blur-md p-6">
+    <div className="w-full rounded-xl border border-white/10 bg-gradient-to-b from-purple-900/40 via-blue-900/30 to-blue-900/20 backdrop-blur-md p-6 mb-10">
       <h2 className="text-xl font-semibold text-purple-300 mb-4">Your Domains</h2>
       {domains.length === 0 ? (
         <p className="text-zinc-400">No domains found</p>
