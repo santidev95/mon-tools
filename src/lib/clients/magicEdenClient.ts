@@ -1,5 +1,5 @@
 const API_URL = "https://api-mainnet.magiceden.dev/v3/rtp/monad-testnet/collections/v7";
-const API_KEY = "d79f52a1-1a8c-42a0-9d6b-7afaf5a6e54c";
+const API_KEY = process.env.MAGICEDEN_API_KEY;
 
 export interface MagicEdenCollection {
   id: string;
