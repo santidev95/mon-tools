@@ -38,6 +38,7 @@ export default function PortfolioPage() {
                 }
                 if (address) {
                     const balances = await getWalletBalances(address);
+                    console.log(balances);
                     const monBalance = balances.find((balance) => balance.symbol === "MON");
                     setMonBalance(monBalance?.balance || "0");
                     setBalances(balances);
