@@ -290,9 +290,9 @@ export default function BulkTransferPage() {
       </form>
       <br></br>
       <div className="flex justify-center gap-2">
-      <label className="text-sm text-gray-400">Bulk Transfer Contract: 0x73Fc1b28F405df9B4B97960F1A0C64C656708524 </label>
+      <label className="text-sm text-gray-400">Bulk Transfer Contract: 0xf7005a4D86d277A1D43CB49D05660d20c24d79f2 </label>
       <a 
-          href="https://testnet.monadexplorer.com/address/0x73Fc1b28F405df9B4B97960F1A0C64C656708524" 
+          href="https://testnet.monadexplorer.com/address/0xf7005a4D86d277A1D43CB49D05660d20c24d79f2" 
           target="_blank"
           className="text-purple-400 hover:text-purple-300"
       >
