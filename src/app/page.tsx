@@ -85,6 +85,13 @@ export default function HomePage() {
           active={true}
           blank={true}
         />
+        <ToolCard
+          title="Monad Analytics"
+          description="See analytics on Monad"
+          href="https://analytics.montools.xyz"
+          active={true}
+          blank={true}
+        />
       </div>
     </main>
   );
