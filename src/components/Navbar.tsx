@@ -1,13 +1,15 @@
 "use client";
 
-import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import ConnectButton from "./connectButton";
 import Image from "next/image";
 import Link from "next/link";
+import { useAppKitAccount } from "@reown/appkit/react";
+import { DisconnectButton } from "./DisconnectButton";
 
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false); 
+  const { isConnected } = useAppKitAccount();
 
   return (
     <nav className="bg-zinc-950 text-gray-200 px-6 py-2 shadow-md">
@@ -24,7 +26,7 @@ export default function Navbar() {
 
         {/* Connect button - now visible on both mobile and desktop */}
         <div className="flex items-center">
-          <ConnectButton />
+        <ConnectButton />
         </div>
       </div>
     </nav>
