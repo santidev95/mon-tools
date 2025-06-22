@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 const INTERNAL_API_PREFIX = '/api/monorail/';
-const ALLOWED_ORIGIN = 'https://testnet.montools.xyz';
+const ALLOWED_ORIGIN = ['https://testnet.montools.xyz', 'http://localhost:3000'];
 
 export function middleware(req: NextRequest) {
     const { pathname } = req.nextUrl;
@@ -10,7 +10,7 @@ export function middleware(req: NextRequest) {
 
     const isInternalAPI = pathname.startsWith(INTERNAL_API_PREFIX);
 
-    if (isInternalAPI && !(referer.startsWith(ALLOWED_ORIGIN) || origin.startsWith(ALLOWED_ORIGIN))) {
+    if (isInternalAPI && !ALLOWED_ORIGIN.some(origin => referer.startsWith(origin) || origin.startsWith(origin))) {
         console.info(`[Middleware] Request to ${req.nextUrl.pathname} from ${referer} or ${origin} is forbidden`);
         return new NextResponse("Forbidden", { status: 403 });
     }
@@ -19,5 +19,5 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-    matcher: ['/api/monorail/:path*'],
+    matcher: ['/api/monorail/:path*', '/api/magiceden/:path*'],
   };

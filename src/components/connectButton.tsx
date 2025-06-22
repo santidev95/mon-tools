@@ -1,7 +1,7 @@
 "use client";
 
 import { useAppKitWallet } from "@reown/appkit-wallet-button/react";
-import { useAppKit, useAppKitAccount, useAppKitBalance, useDisconnect } from "@reown/appkit/react";
+import { useAppKit, useAppKitAccount, useAppKitBalance } from "@reown/appkit/react";
 import { allDomainsClient } from "@/lib/clients/allDomains";
 import { useEffect, useState } from "react";
 import { ClipLoader } from 'react-spinners';
