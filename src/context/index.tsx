@@ -13,31 +13,14 @@ if (!projectId) {
   throw new Error('Project ID is not defined')
 }
 
-const metadata = {
-  name: 'montools',
-  description: 'MonTools',
-  url: 'https://montools.xyz', 
-  icons: ['https://avatars.githubusercontent.com/u/179229932']
-}
-
 const modal = createAppKit({
   adapters: [wagmiAdapter],
   projectId,
   networks: [monadTestnet],
   defaultNetwork: monadTestnet,
-  metadata: metadata,
   features: {
     analytics: true
-  },
-  themeMode: "dark",
-  themeVariables: {
-    "--w3m-accent": "#c084fc",              
-    "--w3m-color-mix": "#000000",           
-    "--w3m-color-mix-strength": 0,          
-    "--w3m-font-family": "monospace",       
-    "--w3m-font-size-master": "9px",
-    "--w3m-border-radius-master": "5px",
-  }
+  }  
 })
 
 function ContextProvider({ children, cookies }: { children: ReactNode; cookies: string | null }) {
