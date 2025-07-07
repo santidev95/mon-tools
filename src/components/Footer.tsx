@@ -82,7 +82,7 @@ export function Footer() {
 
         <div className="mt-8 pt-6 border-t border-violet-900/30 flex flex-col md:flex-row justify-between items-center">        
           <p className="text-xs text-violet-400">
-            &copy; {new Date().getFullYear()} MonTools. Built by &nbsp;
+            {new Date().getFullYear()} MonTools v2.0.0  |  Built by&nbsp;
             <a href="https://x.com/gabriell_santi" target="_blank" rel="noopener noreferrer" className="text-purple-300 hover:text-violet-200 font-semibold">
                Santi
               </a>  

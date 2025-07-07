@@ -1,6 +1,6 @@
 {
-  "name": "monadic-tools",
-  "version": "1.6.0",
+  "name": "montools",
+  "version": "2.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
