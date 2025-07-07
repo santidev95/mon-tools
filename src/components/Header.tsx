@@ -34,10 +34,7 @@ export function Header() {
           </Link>
           <Link href="/swap" className="text-sm font-medium text-purple-300 hover:text-white transition-colors">
             Swap
-          </Link>
-          <Link href="https://montools.xyz/docs" target="_blank" className="text-sm font-medium text-purple-300 hover:text-white transition-colors">
-            Documentation
-          </Link>     
+          </Link>             
         </nav>
 
         <div className="flex items-center gap-4">
@@ -79,14 +76,7 @@ export function Header() {
                   onClick={() => setIsOpen(false)}
                 >
                   Tools
-                </Link>
-                <Link
-                  href="#"
-                  className="text-base md:text-sm font-medium text-gray-200 hover:text-white transition-colors"
-                  onClick={() => setIsOpen(false)}
-                >
-                  Documentation
-                </Link>
+                </Link>                
                 <ConnectButton />
               </nav>
             </SheetContent>
