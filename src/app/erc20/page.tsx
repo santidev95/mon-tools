@@ -31,7 +31,7 @@ export default function TokenInspectorPage() {
   };
 
   return (
-    <div className="max-w-xl mx-auto px-4 py-10">
+    <div className="mt-10 max-w-xl mx-auto px-4 py-10 bg-zinc-900/50 rounded-xl border border-zinc-800">
       <h1 className="text-xl font-bold text-violet-400 mb-4">ERC20 Token Inspector</h1>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
