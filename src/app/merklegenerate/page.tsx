@@ -35,7 +35,7 @@ export default function MerkleTool() {
   };
 
   return (
-    <div className="max-w-xl mx-auto px-4 py-10 text-white">
+    <div className="mt-10 max-w-xl mx-auto px-4 py-10 bg-zinc-900/50 rounded-xl border border-zinc-800 mb-10">
       <h1 className="text-xl font-bold text-purple-400 mb-4">Merkle Proof Generator</h1>
       <textarea
         rows={10}

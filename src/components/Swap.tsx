@@ -51,7 +51,7 @@ export default function Swap() {
   return (
     <div className="flex flex-col md:flex-row gap-8 justify-center items-center w-full min-h-[70vh] py-10">
       {/* Painel de Swap */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-lg p-6 w-full max-w-lg min-w-[500px]">
+      <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl shadow-lg p-6 w-full max-w-lg min-w-[500px]">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl font-bold text-violet-400 font-mono">MonTools Swap</h2>
           <div className="flex items-center gap-3">
@@ -253,7 +253,7 @@ export default function Swap() {
       </div>
 
       {/* Painel de Detalhes */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-lg p-6 w-full max-w-sm min-w-[280px]">
+      <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl shadow-lg p-6 w-full max-w-sm min-w-[280px]">
         <div className="mb-4">
           <div className="text-gray-400 text-xs font-mono">Price</div>
           <div className="text-2xl font-bold text-white font-mono flex items-center gap-2">

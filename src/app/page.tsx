@@ -1,73 +1,146 @@
-"use client";
+'use client'
 
-import ToolCard from "@/components/ToolCard";
-import MonToolsOS from "@/components/os/MonToolsOS";
-import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Badge } from "@/components/ui/badge"
+import { MoveRight, Rocket, BarChart2, Clock, Zap, Search, Share2, GitMerge, Layers, Hexagon } from "lucide-react"
+import { Header } from "@/components/Header"
+import { HeroSection } from "@/components/HeroSection"
+import { Footer } from "@/components/Footer"
+import Link from "next/link"
 
-const useOSLayout = process.env.NEXT_PUBLIC_USE_OS_LAYOUT === "true";
-
-export default function HomePage() {
-  const router = useRouter();
-
-  if (useOSLayout) {
-    return <MonToolsOS />;
-  }
-
-  const handleTryOS = () => {
-    router.push("/os");
-  };
-
+export default function Home() {
   return (
-    <main className="max-w-6xl mx-auto px-6 py-10">
-      {/* OS button */}
-      <div className="flex flex-col items-center mb-6">
-        <button
-          onClick={handleTryOS}
-          className="mb-2 relative inline-flex h-12 overflow-hidden rounded-full p-[1px] focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50"
-        >
-          <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#E2CBFF_0%,#393BB2_50%,#E2CBFF_100%)]" />
-          <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-slate-950 px-3 py-1 text-sm font-medium text-white backdrop-blur-3xl">
-            Click & Try MonTools OS 🚀
-          </span>
-        </button>
-        <span className="text-indigo-300 text-sm text-center">
-          Explore a visual shell experience to navigate your tools faster
-        </span>
-      </div>
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-950 to-slate-900">
+      <main className="container mx-auto px-4 py-8 flex-1">
+        <HeroSection />
 
-      {/* Section: Portfolio & Analysis */}
-      <Section title="Portfolio & Analysis">
-        <ToolCard title="Your Portfolio" description="See your address portfolio" href="/portfolio" active={true} />
-        <ToolCard title="Monad Analytics" description="See analytics on Monad" href="https://analytics.montools.xyz" active={true} blank={true} />
-        <ToolCard title="Monad Real-Time Transactions" description="See the latest transactions on Monad" href="https://monad-tx-viewer.vercel.app" active={true} blank={true} />
-      </Section>
+        <Tabs defaultValue="portfolio" className="mt-12">
+          <TabsList className="flex w-full overflow-x-auto no-scrollbar mb-8 gap-2 sm:grid sm:grid-cols-3 min-w-0">
+            <TabsTrigger value="portfolio" className="text-xs whitespace-nowrap px-2 py-1 min-w-[120px]">Portfolio & Analysis</TabsTrigger>
+            <TabsTrigger value="tokens" className="text-xs whitespace-nowrap px-2 py-1 min-w-[120px]">Token Tools</TabsTrigger>
+            <TabsTrigger value="nfts" className="text-xs whitespace-nowrap px-2 py-1 min-w-[120px]">NFTs & Interoperability</TabsTrigger>
+          </TabsList>
 
-      {/* Section: Token Tools */}
-      <Section title="Token Tools">
-        <ToolCard title="ERC-20 Token Deployer" description="Deploy your customized ERC-20 token" href="/deployer" active={true} />
-        <ToolCard title="ERC-20 Inspector" description="Inspect an ERC-20 token's details" href="/erc20" active={true} />
-        <ToolCard title="Token Bulk Transfer" description="Send a token amount to multiple wallets" href="/bulktransfer" active={true} />
-        <ToolCard title="Merkle Root Generator" description="Generate a merkle root and proofs" href="/merklegenerate" active={true} />
-      </Section>
+          <TabsContent value="portfolio" className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <FeatureCard
+                title="Your Portfolio"
+                description="See your address portfolio"
+                icon={<Hexagon className="h-5 w-5" />}
+                gradient="from-violet-500 to-purple-500"
+                href="/portfolio"
+              />
+              <FeatureCard
+                title="Monad Analytics"
+                description="See analytics on Monad"
+                icon={<BarChart2 className="h-5 w-5" />}
+                gradient="from-fuchsia-500 to-pink-500"
+                href="https://analytics.montools.xyz"               
+              />
+              <FeatureCard
+                title="Monad Real-Time Transactions"
+                description="See the latest transactions on Monad"
+                icon={<Clock className="h-5 w-5" />}
+                gradient="from-purple-500 to-indigo-500"
+                href="https://monad-tx-viewer.vercel.app"
+              />
+            </div>
+          </TabsContent>
 
-      {/* Section: NFTs & Swap */}
-      <Section title="NFTs & Interoperability">
-        <ToolCard title="NFT Inspector" description="Details of any NFT collection" href="/nft" active={true} />
-        <ToolCard title="Swap" description="Swap in tokens in Monad" href="/swap" active={true} />
-        <ToolCard title="MonBridge (soon)" description="Bridge in Multichains" href="/bridge" active={false} />
-      </Section>
-    </main>
-  );
+          <TabsContent value="tokens" className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <FeatureCard
+                title="ERC-20 Token Deployer"
+                description="Deploy your customized ERC-20 token"
+                icon={<Rocket className="h-5 w-5" />}
+                gradient="from-cyan-500 to-blue-500"
+                href="/deployer"
+              />
+              <FeatureCard
+                title="ERC-20 Inspector"
+                description="Inspect an ERC-20 token's details"
+                icon={<Search className="h-5 w-5" />}
+                gradient="from-blue-500 to-indigo-500"
+                href="/erc20"
+              />
+              <FeatureCard
+                title="Token Bulk Transfer"
+                description="Send a token amount to multiple wallets"
+                icon={<Share2 className="h-5 w-5" />}
+                gradient="from-indigo-500 to-violet-500"
+                href="/bulktransfer"
+              />
+              <FeatureCard
+                title="Merkle Root Generator"
+                description="Generate a merkle root and proofs"
+                icon={<GitMerge className="h-5 w-5" />}
+                gradient="from-violet-500 to-purple-500"
+                href="/merklegenerate"
+              />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="nfts" className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <FeatureCard
+                title="NFT Inspector"
+                description="Details of any NFT collection"
+                icon={<Layers className="h-5 w-5" />}
+                gradient="from-amber-500 to-orange-500"
+                href="/nft"
+              />
+              <FeatureCard
+                title="Swap"
+                description="Swap in tokens in Monad"
+                icon={<Zap className="h-5 w-5" />}
+                gradient="from-orange-500 to-red-500"
+                href="/swap"
+              />
+              <FeatureCard
+                title="MonBridge (soon)"
+                description="Bridge to Multichain"
+                icon={<GitMerge className="h-5 w-5" />}
+                gradient="from-gray-500 to-slate-500"
+                soon={true}
+              />
+            </div>
+          </TabsContent>
+        </Tabs>
+      </main>
+    </div>
+  )
 }
 
-// Reusable section component
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function FeatureCard({ title, description, icon, gradient, soon = false, href }: { title: string; description: string; icon: React.ReactNode; gradient: string; soon?: boolean; href?: string }) {
   return (
-    <div className="mb-6">
-      <h2 className="text-xl font-semibold text-violet-200 mb-2">{title}</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {children}
-      </div>
-    </div>
-  );
+    <Card className="overflow-hidden border-0 shadow-lg bg-black/20 backdrop-blur-sm hover:shadow-xl transition-all duration-300 hover:translate-y-[-5px]">
+      <div className={`h-1 w-full bg-gradient-to-r ${gradient}`}></div>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-xl font-bold text-white">{title}</CardTitle>
+        <div className={`p-2 rounded-full bg-gradient-to-r ${gradient}`}>{icon}</div>
+      </CardHeader>
+      <CardContent>
+        <CardDescription className="text-gray-300">{description}</CardDescription>
+        <div className="mt-4 flex items-center justify-between">
+          {soon ? (
+            <Badge variant="outline" className="text-gray-400 border-gray-700">
+              Coming Soon
+            </Badge>
+          ) : href ? (
+            <Link href={href}>
+              <Button variant="ghost" className="text-white hover:text-purple-300 p-0 flex items-center gap-2">
+                Explore <MoveRight className="h-4 w-4" />
+              </Button>
+            </Link>
+          ) : (
+            <Button variant="ghost" className="text-white hover:text-purple-300 p-0 flex items-center gap-2" disabled>
+              Explore <MoveRight className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  )
 }

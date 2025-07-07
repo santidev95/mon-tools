@@ -49,7 +49,7 @@ export default function DeployForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-full max-w-3xl bg-[#1a1a1a] rounded-xl p-8 space-y-6 mx-auto border border-[#2a2a2a]"
+      className="w-full max-w-3xl bg-zinc-900/50 rounded-xl p-8 space-y-6 mx-auto border border-[#2a2a2a]"
     >
     <h2 className="text-2xl font-bold text-white mb-2">Deploy new Token</h2>
   
