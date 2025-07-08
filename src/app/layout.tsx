@@ -16,7 +16,22 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "MonTools",
-  description: "Tools for Monad Tesnet",
+  description: "MonTools is a modern, modular, and open-source web platform designed to streamline interactions on the Monad Testnet",
+  icons: {
+    icon: "/favicon.ico",
+  },
+  openGraph: {
+    title: "MonTools",
+    description: "MonTools is a modern, modular, and open-source web platform designed to streamline interactions on the Monad Testnet",
+    url:"https://montools.xyz/",
+    locale: "en_US",
+    type: "website",
+    images: [
+      {
+        url: "/logo.png",      
+      },
+    ]
+  }
 };
 
 export default async function RootLayout({
