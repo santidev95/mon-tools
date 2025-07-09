@@ -51,7 +51,7 @@ export function HeroSection() {
             variant="outline"
             size="lg"
             className="border-purple-500 text-purple-300 hover:text-white hover:bg-purple-950/50 px-8 py-6 text-lg bg-transparent"
-            onClick={() => router.push("https://montools.xyz/docs")}
+            onClick={() => window.open("https://montools.xyz/docs", "_blank")}
           >
             View Documentation
           </Button>

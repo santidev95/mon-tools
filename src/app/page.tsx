@@ -5,9 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { MoveRight, Rocket, BarChart2, Clock, Zap, Search, Share2, GitMerge, Layers, Hexagon } from "lucide-react"
-import { Header } from "@/components/Header"
 import { HeroSection } from "@/components/HeroSection"
-import { Footer } from "@/components/Footer"
 import Link from "next/link"
 
 export default function Home() {
