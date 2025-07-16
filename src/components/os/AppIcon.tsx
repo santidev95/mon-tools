@@ -2,28 +2,29 @@ import React from "react";
 import Image from "next/image";
 
 interface AppIconProps {
-  src: string;
-  alt: string;
-  size?: number;
-  onClick?: () => void;
+  label: string;
+  icon: string;
+  onClick: () => void;
 }
 
-export default function AppIcon({ src, alt, size = 64, onClick }: AppIconProps) {
+export default function AppIcon({ label, icon, onClick }: AppIconProps) {
   return (
-    <div 
-      className={`w-${size} h-${size} cursor-pointer flex items-center justify-center`}
+    <button
+      className="flex flex-col items-center w-16 text-white text-xs hover:opacity-80"
       onClick={onClick}
     >
-      <Image
-        src={src}
-        alt={alt}
-        width={size}
-        height={size}
-        className="hover:scale-105 transition-transform duration-200"
-        priority={false}
-        loading="lazy"
-        quality={75}
-      />
-    </div>
+      <div className="w-10 h-10 relative">
+        <Image
+          src={icon}
+          alt={label}
+          fill
+          className="object-contain"
+          sizes="40px"
+          quality={75}
+          loading="lazy"
+        />
+      </div>
+      <span className="mt-1 text-shadow text-center">{label}</span>
+    </button>
   );
 }
