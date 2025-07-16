@@ -44,28 +44,28 @@ export default function MonToolsOS({ backgroundImage = "/back.png" }: MonToolsOS
           onClick={() => openApp("deployer")}
         />
         <AppIcon
-          icon="/logo.png"
-          label="Token Inspector"
+          src="/logo.png"
+          alt="Token Inspector"
           onClick={() => openApp("inspector")}
         />
         <AppIcon
-          icon="/logo.png"
-          label="Bulk Transfer"
+          src="/logo.png"
+          alt="Bulk Transfer"
           onClick={() => openApp("bulktransfer")}
         />      
         <AppIcon
-          icon="/logo.png"
-          label="Merkle Tool"
+          src="/logo.png"
+          alt="Merkle Tool"
           onClick={() => openApp("merkle")}
         />
         <AppIcon
-          icon="/logo.png"
-          label="NFT Inspector"
+          src="/logo.png"
+          alt="NFT Inspector"
           onClick={() => openApp("nft")}
         />
         <AppIcon
-          icon="/logo.png"
-          label="Swap"
+          src="/logo.png"
+          alt="Swap"
           onClick={() => openApp("swap")}
         />
       </div>
