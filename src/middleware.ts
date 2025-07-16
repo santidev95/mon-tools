@@ -10,7 +10,7 @@ export function middleware(req: NextRequest) {
 
     const isInternalAPI = pathname.startsWith(INTERNAL_API_PREFIX);
 
-    if (isInternalAPI && !ALLOWED_ORIGIN.some(origin => referer.startsWith(origin) || origin.startsWith(origin))) {
+    if (isInternalAPI && !ALLOWED_ORIGIN.some(allowedOrigin => referer.startsWith(allowedOrigin) || origin.startsWith(allowedOrigin))) {
         console.info(`[Middleware] Request to ${req.nextUrl.pathname} from ${referer} or ${origin} is forbidden`);
         return new NextResponse("Forbidden", { status: 403 });
     }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { usePublicClient, useAccount } from 'wagmi'
 import { Loader2 } from "lucide-react";
 import { getWalletBalances, TokenBalance } from "../../lib/clients/monorail/dataApi";
@@ -26,6 +26,12 @@ export default function PortfolioPage() {
     const [continuation, setContinuation] = useState<string | null>(null);
     const [loadingMore, setLoadingMore] = useState<boolean>(false);
     const loadMoreRef = useRef<HTMLDivElement>(null);
+    const continuationRef = useRef<string | null>(null);
+    const loadingMoreRef = useRef<boolean>(false);
+
+    // Keep refs updated with current values
+    continuationRef.current = continuation;
+    loadingMoreRef.current = loadingMore;
 
     useEffect(() => {
         const fetchData = async () => {
@@ -68,23 +74,29 @@ export default function PortfolioPage() {
         fetchNFTs();
     }, [address]);
 
+    const handleLoadMore = useCallback(async () => {
+        if (continuationRef.current && !loadingMoreRef.current && selectedMenu === "NFTs" && address) {
+            setLoadingMore(true);
+            try {
+                const result = await fetchUserTokens(address, 20, continuationRef.current);
+                if (result) {
+                    setNfts(prev => prev ? [...prev, ...result.tokens] : result.tokens);
+                    setContinuation(result.continuation);
+                }
+            } catch (error) {
+                console.error('Error loading more NFTs:', error);
+            } finally {
+                setLoadingMore(false);
+            }
+        }
+    }, [address, selectedMenu]);
+
     useEffect(() => {
         const observer = new IntersectionObserver(
             async (entries) => {
                 const target = entries[0];
-                if (target.isIntersecting && continuation && !loadingMore && selectedMenu === "NFTs") {
-                    setLoadingMore(true);
-                    try {
-                        const result = await fetchUserTokens(address!, 20, continuation);
-                        if (result) {
-                            setNfts(prev => prev ? [...prev, ...result.tokens] : result.tokens);
-                            setContinuation(result.continuation);
-                        }
-                    } catch (error) {
-                        console.error('Error loading more NFTs:', error);
-                    } finally {
-                        setLoadingMore(false);
-                    }
+                if (target.isIntersecting) {
+                    handleLoadMore();
                 }
             },
             { threshold: 1.0 }
@@ -99,7 +111,7 @@ export default function PortfolioPage() {
                 observer.unobserve(loadMoreRef.current);
             }
         };
-    }, [continuation, loadingMore, address, selectedMenu]);
+    }, [handleLoadMore]); // Only depends on the memoized callback
 
     if (!address) {
         return (
