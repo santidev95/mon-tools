@@ -2,7 +2,7 @@
 
 import NextError from "next/error";
 
-export default function GlobalError() {
+export default function GlobalError({ error }: { error: Error }) {
   return (
     <html>
       <body>
@@ -11,6 +11,8 @@ export default function GlobalError() {
         does not expose status codes for errors, we simply pass 0 to render a
         generic error message. */}
         <NextError statusCode={0} />
+        {/* Optionally, render error details for debugging (remove in production) */}
+        <pre style={{ color: "red", marginTop: 16 }}>{error?.message}</pre>
       </body>
     </html>
   );

@@ -37,7 +37,7 @@ const nextConfig: NextConfig = {
       const BundleAnalyzerPlugin = require('@next/bundle-analyzer')({
         enabled: true,
       });
-      config.plugins.push(new BundleAnalyzerPlugin());
+      config.plugins.push(BundleAnalyzerPlugin);
     }
 
     // Optimize lodash and other large libraries
@@ -51,8 +51,7 @@ const nextConfig: NextConfig = {
     // Tree shake unused modules
     config.optimization = {
       ...config.optimization,
-      usedExports: true,
-      sideEffects: false,
+      usedExports: true
     };
 
     return config;
