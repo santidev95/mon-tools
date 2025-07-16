@@ -39,33 +39,33 @@ export default function MonToolsOS({ backgroundImage = "/back.png" }: MonToolsOS
       {/* Ícones no Desktop */}
       <div className="absolute top-4 left-4 flex flex-col gap-4">        
         <AppIcon
-          icon="/logo.png"
           label="ERC20 Token Deployer"
+          icon="/logo.png"
           onClick={() => openApp("deployer")}
         />
         <AppIcon
-          icon="/logo.png"
           label="Token Inspector"
+          icon="/logo.png"
           onClick={() => openApp("inspector")}
         />
         <AppIcon
-          icon="/logo.png"
           label="Bulk Transfer"
+          icon="/logo.png"
           onClick={() => openApp("bulktransfer")}
         />      
         <AppIcon
-          icon="/logo.png"
           label="Merkle Tool"
+          icon="/logo.png"
           onClick={() => openApp("merkle")}
         />
         <AppIcon
-          icon="/logo.png"
           label="NFT Inspector"
+          icon="/logo.png"
           onClick={() => openApp("nft")}
         />
         <AppIcon
-          icon="/logo.png"
           label="Swap"
+          icon="/logo.png"
           onClick={() => openApp("swap")}
         />
       </div>

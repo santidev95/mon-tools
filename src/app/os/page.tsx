@@ -1,7 +1,21 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import MonToolsOS from "@/components/os/MonToolsOS";
+import Image from "next/image";
+import dynamic from "next/dynamic";
+
+// Dynamically import MonToolsOS to reduce initial bundle size
+const MonToolsOS = dynamic(() => import("@/components/os/MonToolsOS"), {
+  loading: () => (
+    <div className="flex items-center justify-center h-screen w-screen bg-purple-900 text-white">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-white mb-4"></div>
+        <p>Loading MonToolsOS...</p>
+      </div>
+    </div>
+  ),
+  ssr: false
+});
 
 const bootMessages = [
   "Booting MonToolsOS...",
@@ -61,7 +75,7 @@ function BootScreen() {
   
     return (
       <div className="flex flex-col items-center justify-center h-screen w-screen bg-purple-900 text-white font-mono text-sm">
-        <img src="/logo.png" alt="Boot Logo" className="w-20 h-20 mb-4" />
+        <Image src="/logo.png" alt="Boot Logo" className="w-20 h-20 mb-4" width={80} height={80} priority={true} quality={75} />
         <p className="mb-2">MonToolsOS V2.0.0</p>
         <div className="w-64 h-3 bg-black border border-white">
           <div
