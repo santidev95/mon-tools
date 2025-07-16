@@ -145,8 +145,32 @@ export default function Swap() {
                 type="text"
                 value={fromValue}
                 onChange={e => {
-                  // Permite apenas números, vírgula e ponto
-                  const value = e.target.value.replace(/[^0-9.,]/g, "");
+                  // Allow only numbers and single decimal point, prevent multiple decimals
+                  let value = e.target.value;
+                  
+                  // Remove any non-numeric characters except single decimal point
+                  value = value.replace(/[^0-9.]/g, "");
+                  
+                  // Prevent multiple decimal points
+                  const decimalCount = (value.match(/\./g) || []).length;
+                  if (decimalCount > 1) {
+                    // Keep only the first decimal point
+                    const firstDecimalIndex = value.indexOf('.');
+                    value = value.substring(0, firstDecimalIndex + 1) + 
+                           value.substring(firstDecimalIndex + 1).replace(/\./g, '');
+                  }
+                  
+                  // Prevent leading zeros (except for decimal cases like 0.123)
+                  if (value.length > 1 && value[0] === '0' && value[1] !== '.') {
+                    value = value.substring(1);
+                  }
+                  
+                  // Limit decimal places to 18 (common for most tokens)
+                  const decimalIndex = value.indexOf('.');
+                  if (decimalIndex !== -1 && value.length - decimalIndex > 19) {
+                    value = value.substring(0, decimalIndex + 19);
+                  }
+                  
                   setFromValue(value);
                 }}
                 className="bg-transparent text-white font-mono text-right flex-1 outline-none text-xl px-2 appearance-none"

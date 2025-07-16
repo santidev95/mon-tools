@@ -148,7 +148,15 @@ export function useSwapLogic() {
     setManualReloading(true);
     setQuoteError(null);
     try {
-      const amount = fromValue.replace(',', '.');
+      // Normalize decimal separator and validate number format
+      const normalizedAmount = fromValue.replace(',', '.');
+      const amount = normalizedAmount;
+      
+      // Validate that the amount is a valid number
+      if (isNaN(Number(amount)) || Number(amount) <= 0) {
+        throw new Error("Invalid amount format");
+      }
+      
       const quote = await getQuote({
         from: fromToken.address,
         to: toToken.address,
