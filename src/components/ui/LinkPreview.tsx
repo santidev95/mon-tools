@@ -11,6 +11,7 @@ import {
 } from "motion/react";
 
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 type LinkPreviewProps = {
   children: React.ReactNode;
@@ -78,11 +79,14 @@ export const LinkPreview = ({
     <>
       {isMounted ? (
         <div className="hidden">
-          <img
+          <Image
             src={src}
             width={width}
             height={height}
             alt="hidden image"
+            priority={false}
+            loading="lazy"
+            quality={75}
           />
         </div>
       ) : null}
@@ -128,19 +132,22 @@ export const LinkPreview = ({
                   x: translateX,
                 }}
               >
-                <a
-                  href={url}
-                  className="block p-1 bg-white border-2 border-transparent shadow rounded-xl hover:border-neutral-200 dark:hover:border-neutral-800"
-                  style={{ fontSize: 0 }}
-                >
-                  <img
-                    src={isStatic ? imageSrc : src}
-                    width={width}
-                    height={height}
-                    className="rounded-lg"
-                    alt="preview image"
-                  />
-                </a>
+                                  <a
+                    href={url}
+                    className="block p-1 bg-white border-2 border-transparent shadow rounded-xl hover:border-neutral-200 dark:hover:border-neutral-800"
+                    style={{ fontSize: 0 }}
+                  >
+                   <Image
+                     src={isStatic ? imageSrc : src}
+                     alt="preview image"
+                     width={width}
+                     height={height}
+                     className="rounded-lg"
+                     priority={false}
+                     loading="lazy"
+                     quality={75}
+                   />
+                  </a>
               </motion.div>
             )}
           </AnimatePresence>

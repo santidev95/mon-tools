@@ -39,8 +39,8 @@ export default function MonToolsOS({ backgroundImage = "/back.png" }: MonToolsOS
       {/* Ícones no Desktop */}
       <div className="absolute top-4 left-4 flex flex-col gap-4">        
         <AppIcon
-          icon="/logo.png"
-          label="ERC20 Token Deployer"
+          src="/logo.png"
+          alt="ERC20 Token Deployer"
           onClick={() => openApp("deployer")}
         />
         <AppIcon

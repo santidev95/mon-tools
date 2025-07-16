@@ -1,17 +1,29 @@
-type AppIconProps = {
-  label: string;
-  icon: string;
-  onClick: () => void;
-};
+import React from "react";
+import Image from "next/image";
 
-export default function AppIcon({ label, icon, onClick }: AppIconProps) {
+interface AppIconProps {
+  src: string;
+  alt: string;
+  size?: number;
+  onClick?: () => void;
+}
+
+export default function AppIcon({ src, alt, size = 64, onClick }: AppIconProps) {
   return (
-    <button
-      className="flex flex-col items-center w-16 text-white text-xs hover:opacity-80"
+    <div 
+      className={`w-${size} h-${size} cursor-pointer flex items-center justify-center`}
       onClick={onClick}
     >
-      <img src={icon} alt={label} className="w-10 h-10" />
-      <span className="mt-1 text-shadow text-center">{label}</span>
-    </button>
+      <Image
+        src={src}
+        alt={alt}
+        width={size}
+        height={size}
+        className="hover:scale-105 transition-transform duration-200"
+        priority={false}
+        loading="lazy"
+        quality={75}
+      />
+    </div>
   );
 }

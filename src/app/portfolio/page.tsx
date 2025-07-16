@@ -3,13 +3,30 @@
 import { useState, useEffect, useRef } from "react";
 import { usePublicClient, useAccount } from 'wagmi'
 import { Loader2 } from "lucide-react";
+import dynamic from "next/dynamic";
 import { getWalletBalances, TokenBalance } from "../../lib/clients/monorail/dataApi";
 import { fetchUserTokens, MagicEdenToken } from "@/lib/clients/magicEdenClient";
-import { SummaryCard } from "./components/SummaryCard";
-import { TokensCard } from "./components/TokensCard";
-import { StakingCard } from "./components/StakingCard";
-import { NFTsCard } from "./components/NFTsCard";
-import { DomainsCard } from "./components/DomainsCard";
+
+// Dynamically import heavy components with named exports
+const SummaryCard = dynamic(() => import("./components/SummaryCard").then(mod => ({ default: mod.SummaryCard })), {
+  loading: () => <div className="animate-pulse bg-gray-200 h-32 rounded-lg"></div>
+});
+
+const TokensCard = dynamic(() => import("./components/TokensCard").then(mod => ({ default: mod.TokensCard })), {
+  loading: () => <div className="animate-pulse bg-gray-200 h-64 rounded-lg"></div>
+});
+
+const StakingCard = dynamic(() => import("./components/StakingCard").then(mod => ({ default: mod.StakingCard })), {
+  loading: () => <div className="animate-pulse bg-gray-200 h-32 rounded-lg"></div>
+});
+
+const NFTsCard = dynamic(() => import("./components/NFTsCard").then(mod => ({ default: mod.NFTsCard })), {
+  loading: () => <div className="animate-pulse bg-gray-200 h-64 rounded-lg"></div>
+});
+
+const DomainsCard = dynamic(() => import("./components/DomainsCard").then(mod => ({ default: mod.DomainsCard })), {
+  loading: () => <div className="animate-pulse bg-gray-200 h-32 rounded-lg"></div>
+});
 
 
 export default function PortfolioPage() {
