@@ -4,6 +4,9 @@ import "./globals.css";
 import { headers } from "next/headers";
 import LayoutClient from "@/components/LayoutClient";
 
+
+
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -44,6 +47,13 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
+      <head>
+        <script 
+          async 
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9940089922871413"
+          crossOrigin="anonymous"
+        />
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <LayoutClient cookies={cookies}>{children}</LayoutClient>
       </body>
