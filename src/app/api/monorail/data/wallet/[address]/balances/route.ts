@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const BASE_URL = process.env.MONORAIL_DATA_URL;
+const SOURCE_PARAM = process.env.MONORAIL_APP_ID;
 
 export async function GET(request: NextRequest, context: any) {
   const address = context?.params?.address;
@@ -13,7 +14,7 @@ export async function GET(request: NextRequest, context: any) {
   }
 
   try {
-    const response = await fetch(`${BASE_URL}/wallet/${address}/balances`, {
+    const response = await fetch(`${BASE_URL}/wallet/${address}/balances?source=${SOURCE_PARAM}`, {
       headers: { "accept": "application/json" }
     });
 
