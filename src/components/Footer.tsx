@@ -54,7 +54,12 @@ export function Footer() {
                 <Link href="https://github.com/SantiSjp/mon-tools" target="_blank" className="text-sm text-violet-300 hover:text-purple-200 transition-colors">
                   Repository
                 </Link>
-              </li>              
+              </li>         
+              <li>
+                <Link href="https://status.montools.xyz" target="_blank" className="text-sm text-violet-300 hover:text-purple-200 transition-colors">
+                  System Status
+                </Link>
+              </li>     
             </ul>
           </div>
 
