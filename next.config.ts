@@ -14,9 +14,23 @@ const nextConfig: NextConfig = {
 
   // Image optimization
   images: {
-    domains: [
-      "img.reservoir.tools",
-      "montools.xyz"
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'img.reservoir.tools',
+      },
+      {
+        protocol: 'https',
+        hostname: 'montools.xyz',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cca-lite.coinbase.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
     ],
     formats: ['image/webp', 'image/avif'],
     minimumCacheTTL: 60,
@@ -57,7 +71,7 @@ const nextConfig: NextConfig = {
     return config;
   },
 
-  // Headers for performance
+  // Headers for performance and CORS
   async headers() {
     return [
       {
@@ -75,6 +89,35 @@ const nextConfig: NextConfig = {
             key: 'X-XSS-Protection',
             value: '1; mode=block',
           },
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: '*',
+          },
+          {
+            key: 'Access-Control-Allow-Methods',
+            value: 'GET, POST, PUT, DELETE, OPTIONS',
+          },
+          {
+            key: 'Access-Control-Allow-Headers',
+            value: 'Content-Type, Authorization',
+          },
+        ],
+      },
+      {
+        source: '/api/(.*)',
+        headers: [
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: '*',
+          },
+          {
+            key: 'Access-Control-Allow-Methods',
+            value: 'GET, POST, PUT, DELETE, OPTIONS',
+          },
+          {
+            key: 'Access-Control-Allow-Headers',
+            value: 'Content-Type, Authorization',
+          },
         ],
       },
       {
@@ -89,3 +132,5 @@ const nextConfig: NextConfig = {
     ];
   },
 };
+
+export default nextConfig;

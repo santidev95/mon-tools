@@ -1,5 +1,6 @@
 import { Github, Twitter } from "lucide-react"
 import Link from "next/link"
+import { APP_VERSION } from "@/constants"
 
 export function Footer() {
   return (
@@ -87,7 +88,7 @@ export function Footer() {
 
         <div className="mt-8 pt-6 border-t border-violet-900/30 flex flex-col md:flex-row justify-between items-center">        
           <p className="text-xs text-violet-400">
-            {new Date().getFullYear()} MonTools v2.0.0  |  Built by&nbsp;
+            {new Date().getFullYear()} MonTools {APP_VERSION}  |  Built by&nbsp;
             <a href="https://x.com/gabriell_santi" target="_blank" rel="noopener noreferrer" className="text-purple-300 hover:text-violet-200 font-semibold">
                Santi
               </a>  

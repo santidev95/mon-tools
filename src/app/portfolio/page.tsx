@@ -42,7 +42,9 @@ export default function PortfolioPage() {
     const [nfts, setNfts] = useState<MagicEdenToken[] | null>(null);
     const [continuation, setContinuation] = useState<string | null>(null);
     const [loadingMore, setLoadingMore] = useState<boolean>(false);
-    const loadMoreRef = useRef<HTMLDivElement>(null);
+    const [loadMoreElement, setLoadMoreElement] = useState<HTMLDivElement | null>(null);
+
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -78,6 +80,9 @@ export default function PortfolioPage() {
                 if (result) {
                     setNfts(result.tokens);
                     setContinuation(result.continuation);
+                } else {
+                    setNfts([]);
+                    setContinuation(null);
                 }
             }
         };
@@ -85,14 +90,30 @@ export default function PortfolioPage() {
         fetchNFTs();
     }, [address]);
 
+    // Reset loading state when switching away from NFTs menu
     useEffect(() => {
+        if (selectedMenu !== "NFTs") {
+            setLoadingMore(false);
+        }
+    }, [selectedMenu]);
+
+    useEffect(() => {
+        // Only setup observer when we're on NFTs tab and have element
+        if (selectedMenu !== "NFTs" || !loadMoreElement) {
+            return;
+        }
+
+        let isLoading = false; // Local loading state to prevent race conditions
+
         const observer = new IntersectionObserver(
             async (entries) => {
                 const target = entries[0];
-                if (target.isIntersecting && continuation && !loadingMore && selectedMenu === "NFTs") {
+                
+                if (target.isIntersecting && continuation && !isLoading && selectedMenu === "NFTs" && address) {
+                    isLoading = true;
                     setLoadingMore(true);
                     try {
-                        const result = await fetchUserTokens(address!, 20, continuation);
+                        const result = await fetchUserTokens(address, 20, continuation);
                         if (result) {
                             setNfts(prev => prev ? [...prev, ...result.tokens] : result.tokens);
                             setContinuation(result.continuation);
@@ -100,23 +121,23 @@ export default function PortfolioPage() {
                     } catch (error) {
                         console.error('Error loading more NFTs:', error);
                     } finally {
+                        isLoading = false;
                         setLoadingMore(false);
                     }
                 }
             },
-            { threshold: 1.0 }
+            { 
+                threshold: 0.1,
+                rootMargin: '50px'
+            }
         );
 
-        if (loadMoreRef.current) {
-            observer.observe(loadMoreRef.current);
-        }
+        observer.observe(loadMoreElement);
 
         return () => {
-            if (loadMoreRef.current) {
-                observer.unobserve(loadMoreRef.current);
-            }
+            observer.unobserve(loadMoreElement);
         };
-    }, [continuation, loadingMore, address, selectedMenu]);
+    }, [selectedMenu, continuation, loadMoreElement, address]); // Remove loadingMore from dependencies
 
     if (!address) {
         return (
@@ -184,7 +205,7 @@ export default function PortfolioPage() {
                             nfts={nfts}
                             continuation={continuation}
                             loadingMore={loadingMore}
-                            loadMoreRef={loadMoreRef}
+                            onLoadMoreRefReady={setLoadMoreElement}
                         />
                     )}
                     {selectedMenu === "Domains" && (

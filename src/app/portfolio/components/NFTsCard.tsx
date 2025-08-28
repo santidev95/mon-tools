@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from "next/image";
 import { Loader2, ExternalLink } from "lucide-react";
 import { MagicEdenToken } from "@/lib/clients/magicEdenClient";
@@ -8,10 +8,50 @@ interface NFTsCardProps {
     nfts: MagicEdenToken[] | null;
     continuation: string | null;
     loadingMore: boolean;
-    loadMoreRef: React.RefObject<HTMLDivElement | null>;
+    onLoadMoreRefReady: (element: HTMLDivElement | null) => void;
 }
 
-export function NFTsCard({ nfts, continuation, loadingMore, loadMoreRef }: NFTsCardProps) {
+// Custom Image component with error handling
+function NFTImage({ src, alt, className }: { src: string; alt: string; className?: string }) {
+    const [hasError, setHasError] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+
+    if (hasError) {
+        return (
+            <div className="w-full h-full flex items-center justify-center bg-zinc-900">
+                <span className="text-zinc-600">Image failed to load</span>
+            </div>
+        );
+    }
+
+    return (
+        <>
+            {isLoading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-zinc-900">
+                    <Loader2 className="animate-spin text-purple-400 w-6 h-6" />
+                </div>
+            )}
+            <Image
+                src={src}
+                alt={alt}
+                fill
+                className={className}
+                onError={() => setHasError(true)}
+                onLoad={() => setIsLoading(false)}
+                unoptimized={true} // Bypass Next.js optimization for external URLs with CORS issues
+            />
+        </>
+    );
+}
+
+export function NFTsCard({ nfts, continuation, loadingMore, onLoadMoreRefReady }: NFTsCardProps) {
+    // Clear the ref when there's no continuation
+    useEffect(() => {
+        if (!continuation) {
+            onLoadMoreRefReady(null);
+        }
+    }, [continuation, onLoadMoreRefReady]);
+
     return (
         <div className="w-full max-w-5xl rounded-xl border border-white/10 bg-gradient-to-r from-purple-800/60 via-blue-800/60 to-blue-900/60 backdrop-blur-md p-6 mb-2">
             <div className="flex flex-col items-center justify-center">
@@ -22,10 +62,9 @@ export function NFTsCard({ nfts, continuation, loadingMore, loadMoreRef }: NFTsC
                     <div key={`${nft.token.contract}-${nft.token.tokenId}`} className="bg-zinc-800/50 border border-purple-800/30 group relative rounded-lg p-4 flex flex-col transition-colors">
                         <div className="w-[200px] h-[200px] mx-auto relative overflow-hidden rounded-lg aspect-square">
                             {nft.token.image ? (
-                                <Image
+                                <NFTImage
                                     src={nft.token.image}
                                     alt={nft.token.name}
-                                    fill
                                     className="object-cover transition-transform group-hover:scale-110"
                                 />
                             ) : nft.token.media ? (
@@ -40,10 +79,9 @@ export function NFTsCard({ nfts, continuation, loadingMore, loadMoreRef }: NFTsC
                                         playsInline
                                     />
                                 ) : (
-                                    <Image
+                                    <NFTImage
                                         src={nft.token.media}
                                         alt={nft.token.name}
-                                        fill
                                         className="object-cover transition-transform group-hover:scale-110"
                                     />
                                 )
@@ -99,11 +137,20 @@ export function NFTsCard({ nfts, continuation, loadingMore, loadMoreRef }: NFTsC
                 </div>
             )}
             {continuation && (
-                <div ref={loadMoreRef} className="h-10 flex items-center justify-center">
+                <div 
+                    ref={onLoadMoreRefReady} 
+                    className="h-20 flex items-center justify-center mt-4"
+                >
                     {loadingMore ? (
-                        <Loader2 className="animate-spin text-purple-400 w-6 h-6" />
+                        <div className="flex flex-col items-center gap-2">
+                            <Loader2 className="animate-spin text-purple-400 w-6 h-6" />
+                            <span className="text-zinc-400 text-sm">Loading more NFTs...</span>
+                        </div>
                     ) : (
-                        <span className="text-zinc-400">Scroll for more</span>
+                        <div className="flex flex-col items-center gap-2">
+                            <span className="text-zinc-400 text-sm">Scroll for more</span>
+                            <div className="w-8 h-1 bg-purple-400/30 rounded"></div>
+                        </div>
                     )}
                 </div>
             )}
