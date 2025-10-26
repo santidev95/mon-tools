@@ -7,6 +7,8 @@ import { FaXTwitter, FaBook } from "react-icons/fa6";
 import { FaGithub } from "react-icons/fa";
 import { Footer } from "./Footer";
 import { Header } from "./Header";
+import { StickyBanner } from "./ui/Banner";
+import { bannerConfig } from "@/config/banner";
 
 export default function LayoutClient({ children, cookies }: { children: React.ReactNode; cookies: string | null }) {
   const pathname = usePathname();
@@ -19,7 +21,12 @@ export default function LayoutClient({ children, cookies }: { children: React.Re
   return (
     <ContextProvider cookies={cookies}>
       <div className={`relative flex flex-col min-h-screen ${gradientBg}`}>
-        {!hideNavAndFooter && <Header />}
+        {!hideNavAndFooter && (
+          <>
+            <StickyBanner config={bannerConfig} />
+            <Header />
+          </>
+        )}
         <main className="flex-1">{children}
         </main>
         <Toaster position="bottom-center" />
