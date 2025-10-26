@@ -57,6 +57,8 @@ export function useSwapLogic() {
   const [fromTokenBalance, setFromTokenBalance] = useState<string>("");
   const [fromTokenBalanceFormatted, setFromTokenBalanceFormatted] = useState<string>("");
   const [balanceLoading, setBalanceLoading] = useState(false);
+  const [walletTokensCache, setWalletTokensCache] = useState<TokenResult[]>([]);
+  const [isUsingWalletTokens, setIsUsingWalletTokens] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -76,6 +78,9 @@ export function useSwapLogic() {
                 symbol: token.symbol,
                 id: token.id || token.address,
               }));
+              // Armazena todos os tokens da wallet no cache e marca que está usando
+              setWalletTokensCache(convertedTokens);
+              setIsUsingWalletTokens(true);
               setTokens(convertedTokens);
               const monToken = convertedTokens.find(t => t.symbol === "MON");
               if (!fromToken || !convertedTokens.find(t => t.address === fromToken.address)) setFromToken(monToken || convertedTokens[0] || null);
@@ -87,6 +92,10 @@ export function useSwapLogic() {
             console.error("Error fetching wallet balances as fallback:", error);
           }
         }
+        
+        // Se tem dados da categoria, não está usando tokens da wallet
+        setIsUsingWalletTokens(false);
+        setWalletTokensCache([]);
         
         // Lógica original
         setTokens(data);
@@ -124,6 +133,18 @@ export function useSwapLogic() {
   useEffect(() => {
     if (!modalOpen) return;
     setLoading(true);
+    
+    // Se está usando tokens da wallet, filtra do cache por categoria
+    if (isUsingWalletTokens && walletTokensCache.length > 0) {
+      const filteredTokens = walletTokensCache.filter(token => 
+        token.categories && token.categories.includes(modalCategory)
+      );
+      setModalTokens(filteredTokens);
+      setLoading(false);
+      return;
+    }
+    
+    // Caso contrário, usa a lógica original
     getTokensByCategory(modalCategory)
       .then(async (data) => {
         // Se a categoria não retornou tokens e há uma wallet conectada, usa os tokens da wallet
@@ -140,7 +161,11 @@ export function useSwapLogic() {
                 symbol: token.symbol,
                 id: token.id || token.address,
               }));
-              setModalTokens(convertedTokens);
+              // Filtra por categoria
+              const filteredTokens = convertedTokens.filter(token => 
+                token.categories && token.categories.includes(modalCategory)
+              );
+              setModalTokens(filteredTokens);
               return;
             }
           } catch (error) {
@@ -152,7 +177,7 @@ export function useSwapLogic() {
         setModalTokens(data);
       })
       .finally(() => setLoading(false));
-  }, [modalOpen, modalCategory, sender]);
+  }, [modalOpen, modalCategory, sender, isUsingWalletTokens, walletTokensCache]);
 
   const fetchBalance = async () => {
     if (!sender || !fromToken) {
