@@ -61,7 +61,34 @@ export function useSwapLogic() {
   useEffect(() => {
     setLoading(true);
     getTokensByCategory(category)
-      .then((data) => {
+      .then(async (data) => {
+        // Se a categoria não retornou tokens e há uma wallet conectada, usa os tokens da wallet
+        if (data.length === 0 && sender) {
+          try {
+            const walletTokens = await getWalletBalances(sender);
+            if (walletTokens.length > 0) {
+              // Converte TokenBalance para TokenResult
+              const convertedTokens: TokenResult[] = walletTokens.map(token => ({
+                address: token.address,
+                categories: token.categories,
+                decimals: token.decimals,
+                name: token.name,
+                symbol: token.symbol,
+                id: token.id || token.address,
+              }));
+              setTokens(convertedTokens);
+              const monToken = convertedTokens.find(t => t.symbol === "MON");
+              if (!fromToken || !convertedTokens.find(t => t.address === fromToken.address)) setFromToken(monToken || convertedTokens[0] || null);
+              const usdcToken = convertedTokens.find(t => t.symbol === "USDC");
+              if (!toToken || !convertedTokens.find(t => t.address === toToken.address)) setToToken(usdcToken || convertedTokens[1] || null);
+              return;
+            }
+          } catch (error) {
+            console.error("Error fetching wallet balances as fallback:", error);
+          }
+        }
+        
+        // Lógica original
         setTokens(data);
         const monToken = data.find(t => t.symbol === "MON");
         if (!fromToken || !data.find(t => t.address === fromToken.address)) setFromToken(monToken || data[0] || null);
@@ -70,7 +97,7 @@ export function useSwapLogic() {
       })
       .finally(() => setLoading(false));
     // eslint-disable-next-line
-  }, [category]);
+  }, [category, sender]);
 
   useEffect(() => {
     fetchQuote();
@@ -98,11 +125,34 @@ export function useSwapLogic() {
     if (!modalOpen) return;
     setLoading(true);
     getTokensByCategory(modalCategory)
-      .then((data) => {
+      .then(async (data) => {
+        // Se a categoria não retornou tokens e há uma wallet conectada, usa os tokens da wallet
+        if (data.length === 0 && sender) {
+          try {
+            const walletTokens = await getWalletBalances(sender);
+            if (walletTokens.length > 0) {
+              // Converte TokenBalance para TokenResult
+              const convertedTokens: TokenResult[] = walletTokens.map(token => ({
+                address: token.address,
+                categories: token.categories,
+                decimals: token.decimals,
+                name: token.name,
+                symbol: token.symbol,
+                id: token.id || token.address,
+              }));
+              setModalTokens(convertedTokens);
+              return;
+            }
+          } catch (error) {
+            console.error("Error fetching wallet balances as fallback for modal:", error);
+          }
+        }
+        
+        // Lógica original
         setModalTokens(data);
       })
       .finally(() => setLoading(false));
-  }, [modalOpen, modalCategory]);
+  }, [modalOpen, modalCategory, sender]);
 
   const fetchBalance = async () => {
     if (!sender || !fromToken) {
