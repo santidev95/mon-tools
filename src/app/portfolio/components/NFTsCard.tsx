@@ -132,8 +132,14 @@ export function NFTsCard({ nfts, continuation, loadingMore, onLoadMoreRefReady }
                 </div>
             )}
             {nfts?.length === 0 && (
-                <div className="text-center py-8">
-                    <p className="text-zinc-400">No NFTs found.</p>
+                <div className="flex items-center justify-center py-10">
+                    <div className="w-full max-w-3xl bg-zinc-900/70 border border-zinc-800 rounded-2xl p-8 shadow-xl">
+                        <div className="flex items-center gap-3 mb-4">
+                            <Image src="/monad_white.png" alt="Monad" width={120} height={28} />
+                        </div>
+                        <h2 className="text-4xl md:text-5xl font-extrabold text-purple-300 mb-4">Mainnet Soon.</h2>
+                       
+                    </div>
                 </div>
             )}
             {continuation && (

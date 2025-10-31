@@ -59,6 +59,19 @@ export function useSwapLogic() {
   const [balanceLoading, setBalanceLoading] = useState(false);
   const [walletTokensCache, setWalletTokensCache] = useState<TokenResult[]>([]);
   const [isUsingWalletTokens, setIsUsingWalletTokens] = useState(false);
+  const [walletBalancesMap, setWalletBalancesMap] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    // Ajusta categoria padrão conforme conexão da carteira
+    if (sender) {
+      setCategory("mywallet");
+      setModalCategory("mywallet");
+    } else {
+      setCategory("verified");
+      setModalCategory("verified");
+    }
+    // eslint-disable-next-line
+  }, [sender]);
 
   useEffect(() => {
     setLoading(true);
@@ -108,6 +121,26 @@ export function useSwapLogic() {
     // eslint-disable-next-line
   }, [category, sender]);
 
+  // Carrega mapa de saldos da wallet para exibir no modal
+  useEffect(() => {
+    (async () => {
+      if (!sender) {
+        setWalletBalancesMap({});
+        return;
+      }
+      try {
+        const balances = await getWalletBalances(sender);
+        const map: Record<string, string> = {};
+        for (const b of balances) {
+          map[b.address.toLowerCase()] = b.balance;
+        }
+        setWalletBalancesMap(map);
+      } catch (e) {
+        setWalletBalancesMap({});
+      }
+    })();
+  }, [sender]);
+
   useEffect(() => {
     fetchQuote();
     // eslint-disable-next-line
@@ -134,6 +167,37 @@ export function useSwapLogic() {
     if (!modalOpen) return;
     setLoading(true);
     
+    // Categoria especial: My Wallet (mostra apenas tokens com saldo > 0)
+    if (modalCategory === "mywallet") {
+      if (!sender) {
+        setModalTokens([]);
+        setLoading(false);
+        return;
+      }
+      (async () => {
+        try {
+          const balances: TokenBalance[] = await getWalletBalances(sender);
+          const withBalance = balances.filter(b => Number(b.balance) > 0);
+          const converted: TokenResult[] = withBalance.map(token => ({
+            address: token.address,
+            categories: token.categories,
+            decimals: token.decimals,
+            name: token.name,
+            symbol: token.symbol,
+            id: token.id || token.address,
+            balance: token.balance,
+          })).sort((a, b) => Number(b.balance || 0) - Number(a.balance || 0));
+          setModalTokens(converted);
+        } catch (error) {
+          console.error("Error fetching wallet balances for My Wallet:", error);
+          setModalTokens([]);
+        } finally {
+          setLoading(false);
+        }
+      })();
+      return;
+    }
+
     // Se está usando tokens da wallet, filtra do cache por categoria
     if (isUsingWalletTokens && walletTokensCache.length > 0) {
       const filteredTokens = walletTokensCache.filter(token => 
@@ -179,6 +243,30 @@ export function useSwapLogic() {
       .finally(() => setLoading(false));
   }, [modalOpen, modalCategory, sender, isUsingWalletTokens, walletTokensCache]);
 
+  // Atualiza tokens do modal quando saldos mudam e categoria "My Wallet" está selecionada
+  useEffect(() => {
+    if (!modalOpen || modalCategory !== "mywallet" || !sender) return;
+    
+    (async () => {
+      try {
+        const balances: TokenBalance[] = await getWalletBalances(sender);
+        const withBalance = balances.filter(b => Number(b.balance) > 0);
+        const converted: TokenResult[] = withBalance.map(token => ({
+          address: token.address,
+          categories: token.categories,
+          decimals: token.decimals,
+          name: token.name,
+          symbol: token.symbol,
+          id: token.id || token.address,
+          balance: token.balance,
+        })).sort((a, b) => Number(b.balance || 0) - Number(a.balance || 0));
+        setModalTokens(converted);
+      } catch (error) {
+        console.error("Error updating My Wallet tokens:", error);
+      }
+    })();
+  }, [walletBalancesMap, modalOpen, modalCategory, sender]);
+
   const fetchBalance = async () => {
     if (!sender || !fromToken) {
       setFromTokenBalance("");
@@ -207,6 +295,38 @@ export function useSwapLogic() {
   useEffect(() => {
     fetchBalance();
   }, [sender, fromToken]);
+
+  const updateAllBalances = async () => {
+    if (!sender) {
+      setWalletBalancesMap({});
+      setFromTokenBalance("");
+      setFromTokenBalanceFormatted("");
+      return;
+    }
+    try {
+      const balances: TokenBalance[] = await getWalletBalances(sender);
+      const map: Record<string, string> = {};
+      for (const b of balances) {
+        map[b.address.toLowerCase()] = b.balance;
+      }
+      setWalletBalancesMap(map);
+      
+      // Atualiza o saldo do token from
+      if (fromToken) {
+        const token = balances.find(b => b.address.toLowerCase() === fromToken.address.toLowerCase());
+        if (token) {
+          setFromTokenBalance(token.balance);
+          setFromTokenBalanceFormatted(token.balance);
+        } else {
+          setFromTokenBalance("0");
+          setFromTokenBalanceFormatted("0");
+        }
+      }
+    } catch (e) {
+      console.error("Error updating balances:", e);
+      setWalletBalancesMap({});
+    }
+  };
 
   const fetchQuote = async () => {
     if (!fromToken || !toToken || !fromValue || Number(fromValue) <= 0) {
@@ -314,10 +434,12 @@ export function useSwapLogic() {
     quoteExpiry, setQuoteExpiry,
     timerRef,
     modalTokens, setModalTokens,
+    walletBalancesMap,
     fromTokenBalance, setFromTokenBalance,
     fromTokenBalanceFormatted, setFromTokenBalanceFormatted,
     balanceLoading, setBalanceLoading,
     fetchBalance,
+    updateAllBalances,
     fetchQuote,
     handleSwitch,
     bestRouteArr,

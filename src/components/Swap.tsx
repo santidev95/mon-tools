@@ -37,10 +37,12 @@ export default function Swap() {
     quoteExpiry, setQuoteExpiry,
     timerRef,
     modalTokens, setModalTokens,
+    walletBalancesMap,
     fromTokenBalance, setFromTokenBalance,
     fromTokenBalanceFormatted, setFromTokenBalanceFormatted,
     balanceLoading, setBalanceLoading,
     fetchBalance,
+    updateAllBalances,
     fetchQuote,
     handleSwitch,
     bestRouteArr,
@@ -218,10 +220,16 @@ export default function Swap() {
                   value: quoteData.transaction.value ? BigInt(quoteData.transaction.value) : 0n,
                 });
                 setTxHash(tx);
+                
+                // Aguarda confirmação da transação
+                if (!publicClient) throw new Error("Public client not available");
+                toast.loading('Waiting for transaction confirmation...', { id: toastId });
+                await publicClient.waitForTransactionReceipt({ hash: tx });
+                
                 // Show transaction sent toast
                 toast.custom((t) => (
                   <div className="bg-zinc-900 border border-green-400 rounded-lg p-4 text-white font-mono shadow-lg min-w-[220px]">
-                    <div className="font-bold mb-1">Transaction sent!</div>
+                    <div className="font-bold mb-1">Transaction confirmed!</div>
                     <a
                       href={`https://testnet.monadexplorer.com/tx/${tx}`}
                       target="_blank"
@@ -232,8 +240,9 @@ export default function Swap() {
                     </a>
                   </div>
                 ), { id: toastId, duration: 6000 });
-                // Update balance after 3s
-                setTimeout(() => { fetchBalance(); }, 5000);
+                
+                // Atualiza todos os saldos após confirmação
+                await updateAllBalances();
               } catch (err: any) {
                 const errorMsg = err?.message || "Error sending transaction";
                 setSendError(errorMsg);
@@ -347,6 +356,8 @@ export default function Swap() {
           if (modalOpen === "to") setToToken(token);
           setModalOpen(null);
         }}
+        hasWallet={Boolean(sender)}
+        balances={walletBalancesMap}
       />
     </div>
   );

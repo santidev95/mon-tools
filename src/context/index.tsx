@@ -20,7 +20,14 @@ const modal = createAppKit({
   defaultNetwork: monadTestnet,
   features: {
     analytics: true
-  }  
+  },
+  themeMode: 'dark',
+  themeVariables: {
+    '--w3m-accent': '#a78bfa',
+    '--w3m-border-radius-master': '16px',
+    '--w3m-font-size-master': '14px',
+    '--w3m-z-index': 9999
+  }
 })
 
 function ContextProvider({ children, cookies }: { children: ReactNode; cookies: string | null }) {

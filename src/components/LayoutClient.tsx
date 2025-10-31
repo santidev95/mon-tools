@@ -20,14 +20,14 @@ export default function LayoutClient({ children, cookies }: { children: React.Re
 
   return (
     <ContextProvider cookies={cookies}>
-      <div className={`relative flex flex-col min-h-screen ${gradientBg}`}>
+      <div className={`relative flex flex-col min-h-screen ${gradientBg} overflow-x-hidden`}>
         {!hideNavAndFooter && (
           <>
             <StickyBanner config={bannerConfig} />
             <Header />
           </>
         )}
-        <main className="flex-1">{children}
+        <main className="flex-1 overflow-x-hidden">{children}
         </main>
         <Toaster position="bottom-center" />
         {!hideNavAndFooter && (         

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { TokenResult } from "@/lib/clients/monorail/dataApi";
 
-const CATEGORIES = [
+const BASE_CATEGORIES = [
   { key: "verified", label: "Verified" },
   { key: "stable", label: "Stablecoin" },
   { key: "lst", label: "LST" },
@@ -17,6 +17,8 @@ interface TokenSelectModalProps {
   tokens: TokenResult[];
   loading: boolean;
   onSelect: (token: TokenResult) => void;
+  hasWallet?: boolean;
+  balances?: Record<string, string>;
 }
 
 export default function TokenSelectModal({
@@ -27,6 +29,8 @@ export default function TokenSelectModal({
   tokens,
   loading,
   onSelect,
+  hasWallet,
+  balances,
 }: TokenSelectModalProps) {
   const [search, setSearch] = useState("");
   const modalRef = useRef<HTMLDivElement>(null);
@@ -62,7 +66,7 @@ export default function TokenSelectModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 token-scroll">
       <div
         ref={modalRef}
-        className="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl w-full max-w-md p-6 relative animate-fadeIn"
+        className="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl w-full max-w-2xl p-6 relative animate-fadeIn"
       >
         <button
           onClick={onClose}
@@ -79,8 +83,12 @@ export default function TokenSelectModal({
           onChange={e => setSearch(e.target.value)}
           className="w-full mb-3 px-3 py-2 rounded bg-zinc-800 border border-zinc-700 text-sm text-white font-mono focus:border-violet-500 outline-none"
         />
-        <div className="flex gap-2 mb-3 flex-wrap">
-          {CATEGORIES.map((cat) => (
+        <div className="flex gap-2 mb-3 flex-nowrap overflow-x-auto">
+          {(
+            hasWallet
+              ? [...BASE_CATEGORIES, { key: "mywallet", label: "My Wallet" }]
+              : BASE_CATEGORIES
+          ).map((cat) => (
             <button
               key={cat.key}
               onClick={() => setCategory(cat.key)}
@@ -110,7 +118,15 @@ export default function TokenSelectModal({
                     </div>
                     <div className="text-xs text-gray-400 font-mono truncate">{token.address}</div>
                   </div>
-                  {/* Preço e saldo podem ser adicionados aqui se disponíveis */}
+                  <div className="ml-3 text-right min-w-[90px]">
+                    <span className="text-xs text-violet-300 font-mono">
+                      {(() => {
+                        const key = token.address.toLowerCase();
+                        const bal = token.balance || balances?.[key];
+                        return bal ? bal : "";
+                      })()}
+                    </span>
+                  </div>
                 </li>
               ))}
             </ul>
