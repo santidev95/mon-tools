@@ -13,7 +13,7 @@ import { BannerConfig } from "@/components/ui/Banner";
  * - error: Erros ou problemas (vermelho)
  */
 export const bannerConfig: BannerConfig = {
-  enabled: true, // Banner habilitado
+  enabled: false, // Banner habilitado
   message: "Our platform is currently experiencing issues when performing token swaps. We are working to fix it as soon as possible.",
   type: "warning", // info | warning | success | error
   dismissible: false, // Se false, o usuário não poderá fechar o banner
