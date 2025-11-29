@@ -9,9 +9,17 @@ import { Footer } from "./Footer";
 import { Header } from "./Header";
 import { StickyBanner } from "./ui/Banner";
 import { bannerConfig } from "@/config/banner";
+import MigrationScreen from "./MigrationScreen";
 
 export default function LayoutClient({ children, cookies }: { children: React.ReactNode; cookies: string | null }) {
   const pathname = usePathname();
+  const migrationMode = process.env.NEXT_PUBLIC_MIGRATION_MODE === 'true';
+
+  // Show migration screen if migration mode is enabled
+  if (migrationMode) {
+    return <MigrationScreen />;
+  }
+
   const hideNavAndFooter = pathname.startsWith("/os");
   const gradientBg =
     !hideNavAndFooter

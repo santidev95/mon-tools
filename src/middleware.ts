@@ -10,6 +10,27 @@ const ALLOWED_ORIGIN = [
 
 export function middleware(req: NextRequest) {
     const { pathname } = req.nextUrl;
+    
+    // Check if migration mode is enabled
+    const migrationMode = process.env.NEXT_PUBLIC_MIGRATION_MODE === 'true';
+    
+    // Block all routes except static assets and API routes when in migration mode
+    if (migrationMode) {
+        // Allow static assets (images, fonts, etc.)
+        if (
+            pathname.startsWith('/_next/') ||
+            pathname.startsWith('/favicon.ico') ||
+            pathname.match(/\.(ico|png|jpg|jpeg|svg|gif|webp|woff|woff2|ttf|eot)$/)
+        ) {
+            return NextResponse.next();
+        }
+        
+        // Block everything else - redirect to home which will show migration screen
+        if (pathname !== '/') {
+            return NextResponse.redirect(new URL('/', req.url));
+        }
+    }
+
     const referer = req.headers.get("referer") || "";
     const origin = req.headers.get("origin") || "";
 
@@ -44,5 +65,13 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-    matcher: ['/api/monorail/:path*', '/api/magiceden/:path*'],
+    matcher: [
+        /*
+         * Match all request paths except for the ones starting with:
+         * - _next/static (static files)
+         * - _next/image (image optimization files)
+         * - favicon.ico (favicon file)
+         */
+        '/((?!_next/static|_next/image|favicon.ico).*)',
+    ],
   };
