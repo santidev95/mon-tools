@@ -39,7 +39,7 @@ export default function MigrationScreen() {
         {/* Message */}
         <div className="bg-black/30 backdrop-blur-sm border border-purple-500/30 rounded-2xl p-8 space-y-4">
           <p className="text-lg md:text-xl text-gray-200 leading-relaxed">
-            We're working hard to bring MonTools to Monad mainnet!
+            We&apos;re working hard to bring MonTools to Monad mainnet!
           </p>
           <p className="text-base md:text-lg text-gray-300">
             Our platform will be available soon with all features 
