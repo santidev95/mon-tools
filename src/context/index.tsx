@@ -3,7 +3,7 @@
 import { wagmiAdapter, projectId } from '@/config'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createAppKit } from '@reown/appkit/react'
-import { monadTestnet } from '@reown/appkit/networks'
+import { monad } from '@reown/appkit/networks'
 import React, { type ReactNode } from 'react'
 import { cookieToInitialState, WagmiProvider, type Config } from 'wagmi'
 
@@ -16,8 +16,8 @@ if (!projectId) {
 const modal = createAppKit({
   adapters: [wagmiAdapter],
   projectId,
-  networks: [monadTestnet],
-  defaultNetwork: monadTestnet,
+  networks: [monad],
+  defaultNetwork: monad,
   features: {
     analytics: true
   },

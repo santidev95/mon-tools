@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge"
 import { MoveRight, Rocket, BarChart2, Clock, Zap, Search, Share2, GitMerge, Layers, Hexagon } from "lucide-react"
 import { HeroSection } from "@/components/HeroSection"
 import Link from "next/link"
-import Image from "next/image";
 
 export default function Home() {
   return (
@@ -16,14 +15,7 @@ export default function Home() {
         
         
         <HeroSection />
-        <div className="flex items-center justify-center py-5">
-            <div className="w-full max-w-2xl bg-zinc-900/80 border border-zinc-800 rounded-3xl p-8 shadow-xl">
-                <div className="flex items-center gap-3 mb-2">
-                    <Image src="/monad_white.png" alt="Monad" width={120} height={28} />
-                </div>
-                <h2 className="text-3xl sm:text-3xl font-extrabold text-purple-300 text-center">Mainnet Soon...</h2>                 
-            </div>
-        </div>
+        
         
         <Tabs defaultValue="portfolio" className="mt-12">
           <TabsList className="flex w-full overflow-x-auto no-scrollbar mb-8 gap-2 sm:grid sm:grid-cols-3 min-w-0">
