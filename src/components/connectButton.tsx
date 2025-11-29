@@ -1,6 +1,5 @@
 "use client";
 
-import { useAppKitWallet } from "@reown/appkit-wallet-button/react";
 import { useAppKit, useAppKitAccount, useAppKitBalance } from "@reown/appkit/react";
 import { allDomainsClient } from "@/lib/clients/allDomains";
 import { useEffect, useState } from "react";
@@ -11,10 +10,6 @@ function formatAddress(address: string): string {
 }
 
 export default function ConnectButton() {
-  const { connect, isReady, isPending } = useAppKitWallet({
-    onSuccess: (addr) => console.log("Conectado:", addr),
-    onError: (e) => console.error(e),
-  });
   const { open } = useAppKit();
   const { isConnected, address } = useAppKitAccount();
   const [mainDomain, setMainDomain] = useState<string | null>(null);
@@ -48,7 +43,6 @@ export default function ConnectButton() {
       onClick={() => {
         open({ view: isConnected ? "Account" : "Connect" });
       }}
-      disabled={!isReady || isPending}
       style={{
         backgroundColor: isConnected ? "#000000" : "#c084fc",
         color: isConnected ? "#c084fc" : "#000000",
@@ -57,8 +51,7 @@ export default function ConnectButton() {
         borderRadius: "50px",
         fontSize: "15px",
         fontFamily: "monospace",
-        cursor: isReady && !isPending ? "pointer" : "not-allowed",
-        opacity: isReady && !isPending ? 1 : 0.6,
+        cursor: "pointer",
       }}
     >
       {isConnected ? (
@@ -71,7 +64,7 @@ export default function ConnectButton() {
           <span>{balance?.toFixed(2)} MON</span>
         </div>
       ) : (
-        isPending ? <ClipLoader color="#c084fc" size={15} /> : "Connect Wallet"
+        "Connect Wallet"
       )}
     </button>
   );
