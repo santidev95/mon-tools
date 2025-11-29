@@ -5,7 +5,6 @@ MonTools is a modern, modular open source web application providing a suite of u
 ## Features
 
 - **MonTools OS**: A desktop-inspired interface to launch and manage multiple tools in resizable windows, mimicking an operating system experience in your browser.
-- **ERC-20 Token Deployer**: Easily deploy your own ERC-20 tokens with customizable parameters (name, symbol, supply, cap).
 - **ERC-20 Inspector**: Inspect any ERC-20 token by contract address to view its details.
 - **NFT Inspector**: View details of any NFT collection and check if your connected wallet is a holder.
 - **Token Bulk Transfer**: Send a specified amount of a token to multiple addresses in a single operation.
@@ -71,7 +70,6 @@ Visit [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Main Tools
 
-- **ERC-20 Token Deployer**: `/deployer`
 - **ERC-20 Inspector**: `/erc20`
 - **NFT Inspector**: `/nft`
 - **Token Bulk Transfer**: `/bulktransfer`
@@ -79,11 +77,6 @@ Visit [http://localhost:3000](http://localhost:3000) in your browser.
 - **MonTools OS**: `/os` (or click "Try MonTools OS" on the homepage)
 
 ## Tool Details & Usage
-
-### ERC-20 Token Deployer
-- Deploy a new ERC-20 token with customizable name, symbol, initial supply, and (optionally) capped supply.
-- Supports different token profiles (e.g., basic, capped).
-- After deployment, a link to the transaction on Monad Explorer is provided.
 
 ### ERC-20 Inspector
 - Enter any ERC-20 contract address to view its name, symbol, and decimals.

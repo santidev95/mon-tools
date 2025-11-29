@@ -4,10 +4,10 @@ import {
     http,
     formatUnits,
   } from "viem";
-  import { monadTestnet } from "viem/chains";
+  import { monad } from "viem/chains";
   
   const client = createPublicClient({
-    chain: monadTestnet,
+    chain: monad,
     transport: http(process.env.ALCHEMY_URL),
   });
   

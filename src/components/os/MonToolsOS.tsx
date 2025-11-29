@@ -4,7 +4,6 @@ import AppIcon from "./AppIcon";
 import OSWindow from "./OSWindow";
 import Taskbar from "./Taskbar";
 import TokenInspectorApp from "./apps/TokenInspectorApp";
-import TokenDeployerApp from "./apps/TokenDeployerApp";
 import BulkTransferApp from "./apps/BulkTransferApp";
 import MerkleToolApp from "./apps/MerkleToolApp";
 import CollectionInspectorApp from "./apps/CollectionInspectorApp";
@@ -17,7 +16,6 @@ type MonToolsOSProps = {
 
 export default function MonToolsOS({ backgroundImage = "/back.png" }: MonToolsOSProps) {
   const [openApps, setOpenApps] = useState<{ [key: string]: boolean }>({
-    deployer: false,
     inspector: false,
     bulktransfer: false,
     merkle: false,
@@ -38,11 +36,6 @@ export default function MonToolsOS({ backgroundImage = "/back.png" }: MonToolsOS
     >
       {/* Ícones no Desktop */}
       <div className="absolute top-4 left-4 flex flex-col gap-4">        
-        <AppIcon
-          label="ERC20 Token Deployer"
-          icon="/logo.png"
-          onClick={() => openApp("deployer")}
-        />
         <AppIcon
           label="Token Inspector"
           icon="/logo.png"
@@ -78,16 +71,6 @@ export default function MonToolsOS({ backgroundImage = "/back.png" }: MonToolsOS
           defaultSize={{ width: 360, height: 300 }} // 💡 NOVO: define tamanho ideal
         >
           <TokenInspectorApp />
-        </OSWindow>
-      )}      
-      
-      {openApps.deployer && (
-        <OSWindow
-          title="Token Deployer"
-          onClose={() => closeApp("deployer")}
-          defaultSize={{ width: 400, height: 500 }}
-        >
-          <TokenDeployerApp />
         </OSWindow>
       )}
 

@@ -8,12 +8,12 @@ export interface MagicEdenCollection {
   image?: string;
   externalUrl?: string;
   discordUrl?: string;
-  tokenCount: string;
-  onSaleCount: string;
-  ownerCount: number;
-  createdAt: string;
-  supply: string;
-  remainingSupply: string;
+  tokenCount?: string;
+  onSaleCount?: string;
+  ownerCount?: number;
+  createdAt?: string;
+  supply?: string;
+  remainingSupply?: string;
   floorAsk?: {
     price: {
       amount: {
@@ -37,6 +37,31 @@ export interface MagicEdenCollection {
     "allTime"?: number;
   };
   sampleImages?: string[];
+  // Novos campos do formato v4
+  chain?: string;
+  symbol?: string;
+  media?: {
+    url?: string;
+  };
+  social?: {
+    twitterUsername?: string;
+    discordUrl?: string;
+    websiteUrl?: string;
+  };
+  verification?: string;
+  isTradeable?: boolean;
+  royalty?: {
+    recipient?: string;
+    bps?: number;
+    isOptional?: boolean;
+  };
+  collectionType?: string;
+  chainData?: {
+    contract?: string;
+    transferability?: string;
+    collectionBidSupported?: boolean;
+    isMinting?: boolean;
+  };
 }
 
 export interface UserCollection {

@@ -5,7 +5,7 @@ import tokenAbi from "../../abi/IToken.json" assert { type: "json" };
 // CONFIGURATION
 const routerAddress = "0x619d07287e87C9c643C60882cA80d23C8ed44652"; // UniswapV2 Router on Monad Testnet
 const wrappedMonAddress = "0x3bb9AFB94c82752E47706A10779EA525Cf95dc27"; // Wrapped MON address
-const rpcUrl = "https://testnet-rpc.monad.xyz";
+const rpcUrl = "https://rpc.monad.xyz";
 
 /**
  * Buys a token from the DEX (UniswapV2 Router) after the token is listed.

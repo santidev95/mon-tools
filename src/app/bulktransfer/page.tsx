@@ -278,7 +278,7 @@ export default function BulkTransferPage() {
           <div className="mt-4 text-center">
             <span className="text-xs text-gray-400">Txn Hash:&nbsp;</span>
             <a
-              href={`https://testnet.monadexplorer.com//tx/${txHash}`}
+              href={`https://monadvision.com/tx/${txHash}`}
               target="_blank"
               rel="noopener noreferrer"
               className="underline text-purple-400 break-all"
@@ -290,9 +290,9 @@ export default function BulkTransferPage() {
       </form>
       <br></br>
       <div className="flex justify-center gap-2">
-      <label className="text-sm text-gray-400">Bulk Transfer Contract: 0xf7005a4D86d277A1D43CB49D05660d20c24d79f2 </label>
+      <label className="text-sm text-gray-400">Bulk Transfer Contract: 0x78f80583c6d78B46c6558EA0b35Bf284E0F9D380 </label>
       <a 
-          href="https://testnet.monadexplorer.com/address/0xf7005a4D86d277A1D43CB49D05660d20c24d79f2" 
+          href="https://monadvision.com/address/0x78f80583c6d78B46c6558EA0b35Bf284E0F9D380" 
           target="_blank"
           className="text-purple-400 hover:text-purple-300"
       >
@@ -300,9 +300,9 @@ export default function BulkTransferPage() {
       </a>  
       </div>
       <div className="flex justify-center gap-2">
-      <label className="text-sm text-gray-400">Native MultiSend Contract: 0xB135EC2dF1Af065a38B901CBc818e0E462e8A1c6 </label>
+      <label className="text-sm text-gray-400">Native MultiSend Contract: 0x1B403f2382E6efb87eA415e28cD55F89C2faF19f </label>
       <a 
-          href="https://testnet.monadexplorer.com/address/0xB135EC2dF1Af065a38B901CBc818e0E462e8A1c6" 
+          href="https://monadvision.com/address/0x1B403f2382E6efb87eA415e28cD55F89C2faF19f" 
           target="_blank"
           className="text-purple-400 hover:text-purple-300"
       >

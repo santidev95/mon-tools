@@ -28,8 +28,8 @@ const BULK_TRANSFER_ABI: Abi = [
   }
 ];
 
-const BULK_TRANSFER_ADDRESS = "0xf7005a4D86d277A1D43CB49D05660d20c24d79f2";
-const MULSEEND_CONTRACT: `0x${string}` = "0xB135EC2dF1Af065a38B901CBc818e0E462e8A1c6";
+const BULK_TRANSFER_ADDRESS = "0x78f80583c6d78B46c6558EA0b35Bf284E0F9D380";
+const MULSEEND_CONTRACT: `0x${string}` = "0x1B403f2382E6efb87eA415e28cD55F89C2faF19f";
 
 export function useBulkTransferWithApprove() {
   const { data: walletClient } = useWalletClient();

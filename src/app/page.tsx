@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
-import { MoveRight, Rocket, BarChart2, Clock, Zap, Search, Share2, GitMerge, Layers, Hexagon } from "lucide-react"
+import { MoveRight, BarChart2, Clock, Zap, Search, Share2, GitMerge, Layers, Hexagon } from "lucide-react"
 import { HeroSection } from "@/components/HeroSection"
 import Link from "next/link"
 
@@ -52,13 +52,6 @@ export default function Home() {
 
           <TabsContent value="tokens" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <FeatureCard
-                title="ERC-20 Token Deployer"
-                description="Deploy your customized ERC-20 token"
-                icon={<Rocket className="h-5 w-5" />}
-                gradient="from-cyan-500 to-blue-500"
-                href="/deployer"
-              />
               <FeatureCard
                 title="ERC-20 Inspector"
                 description="Inspect an ERC-20 token's details"

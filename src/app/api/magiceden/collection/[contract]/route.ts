@@ -9,14 +9,20 @@ export async function GET(
   const { params } = context;
   const contract  = (await params).contract;
   console.log("contract",contract);
-  const url = `https://api-mainnet.magiceden.dev/v3/rtp/monad-testnet/collections/v7?contract=${contract}&includeMintStages=true&includeSecurityConfigs=true`;
+  const url = `https://api-mainnet.magiceden.dev/v4/evm-public/collections`;
 
   try {
     const response = await fetch(url, {
+      method: "POST",
       headers: {
         Accept: "*/*",
         Authorization: `Bearer ${API_KEY}`,
+        "Content-Type": "application/json",
       },
+      body: JSON.stringify({
+        collectionIds: [contract],
+        chain: "monad",
+      }),
       cache: "no-store",
     });
 
