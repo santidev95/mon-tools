@@ -1,7 +1,7 @@
 import { createClient } from 'redis';
 import { NextRequest, NextResponse } from 'next/server';
 import { createPublicClient, getContract, http } from 'viem';
-import { monadTestnet } from 'viem/chains';
+import { monad } from 'viem/chains';
 
 const ERC20_ABI = [
   { name: 'symbol', type: 'function', stateMutability: 'view', inputs: [], outputs: [{ type: 'string' }] },
@@ -10,8 +10,8 @@ const ERC20_ABI = [
 ];
 
 const viemClient = createPublicClient({
-  chain: monadTestnet,
-  transport: http("https://monad-testnet.g.alchemy.com/v2/FZhCjyj9iYvSCrnRcV4CcDXKzFrfrp5m"),
+  chain: monad,
+  transport: http("https://monad-mainnet.g.alchemy.com/v2/VfXPhiNTDFhlT8Unne9WW"),
 });
 
 function validateAddress(input: string): `0x${string}` | null {

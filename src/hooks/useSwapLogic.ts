@@ -197,51 +197,19 @@ export function useSwapLogic() {
       })();
       return;
     }
-
-    // Se está usando tokens da wallet, filtra do cache por categoria
-    if (isUsingWalletTokens && walletTokensCache.length > 0) {
-      const filteredTokens = walletTokensCache.filter(token => 
-        token.categories && token.categories.includes(modalCategory)
-      );
-      setModalTokens(filteredTokens);
-      setLoading(false);
-      return;
-    }
     
-    // Caso contrário, usa a lógica original
+    // Para outras categorias, sempre busca todos os tokens da categoria da API
+    // independente de ter wallet conectada ou não
     getTokensByCategory(modalCategory)
-      .then(async (data) => {
-        // Se a categoria não retornou tokens e há uma wallet conectada, usa os tokens da wallet
-        if (data.length === 0 && sender) {
-          try {
-            const walletTokens = await getWalletBalances(sender);
-            if (walletTokens.length > 0) {
-              // Converte TokenBalance para TokenResult
-              const convertedTokens: TokenResult[] = walletTokens.map(token => ({
-                address: token.address,
-                categories: token.categories,
-                decimals: token.decimals,
-                name: token.name,
-                symbol: token.symbol,
-                id: token.id || token.address,
-              }));
-              // Filtra por categoria
-              const filteredTokens = convertedTokens.filter(token => 
-                token.categories && token.categories.includes(modalCategory)
-              );
-              setModalTokens(filteredTokens);
-              return;
-            }
-          } catch (error) {
-            console.error("Error fetching wallet balances as fallback for modal:", error);
-          }
-        }
-        
-        // Lógica original
+      .then((data) => {
         setModalTokens(data);
       })
+      .catch((error) => {
+        console.error("Error fetching tokens by category:", error);
+        setModalTokens([]);
+      })
       .finally(() => setLoading(false));
-  }, [modalOpen, modalCategory, sender, isUsingWalletTokens, walletTokensCache]);
+  }, [modalOpen, modalCategory, sender]);
 
   // Atualiza tokens do modal quando saldos mudam e categoria "My Wallet" está selecionada
   useEffect(() => {

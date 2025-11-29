@@ -1,12 +1,11 @@
 import { TldParser, NetworkWithRpc } from '@onsol/tldparser';
-import { getAddress } from 'ethers';
 
 
 let parser: TldParser | null = null;
 
 export function getTldParser(): TldParser {
     if (!parser) {
-      const network = new NetworkWithRpc('monad', 10143, process.env.ALCHEMY_URL || 'https://monad-testnet.g.alchemy.com/v2/FZhCjyj9iYvSCrnRcV4CcDXKzFrfrp5m');
+      const network = new NetworkWithRpc('monad', 143, process.env.ALCHEMY_URL || 'https://monad-mainnet.g.alchemy.com/v2/VfXPhiNTDFhlT8Unne9WW');
       parser = new TldParser(network, 'monad');
     }
     return parser;

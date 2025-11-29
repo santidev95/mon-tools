@@ -99,7 +99,7 @@ export function NFTsCard({ nfts, continuation, loadingMore, onLoadMoreRefReady }
                                     </p>
                                 )}
                                 <Link 
-                                    href={`https://magiceden.io/collections/monad-testnet/${nft.token.contract}`}
+                                    href={`https://magiceden.io/collections/monad/${nft.token.contract}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="flex items-center gap-2 text-purple-400 hover:text-purple-300 transition-colors drop-shadow-md"
