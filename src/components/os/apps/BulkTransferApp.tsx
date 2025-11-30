@@ -1,15 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useBulkTransferWithApprove } from "@/lib/useBulkTransferWithApprove";
-import { useTokenBalances } from "@/lib/useTokenBalances";
 import toast from "react-hot-toast";
 import { useAccount } from "wagmi";
-import { Listbox } from '@headlessui/react';
-import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
 import { isAddress } from "ethers";
 import { allDomainsClient } from "@/lib/clients/allDomains";
 import { LiaExternalLinkAltSolid } from "react-icons/lia";
+import TokenSelectModal from "@/components/TokenSelectModal";
+import { getTokensByCategory, getWalletBalances, TokenResult, TokenBalance } from "@/lib/clients/monorail/dataApi";
+
+const CATEGORIES = [
+  { key: "verified", label: "Verified" },
+  { key: "stable", label: "Stablecoin" },
+  { key: "lst", label: "LST" },
+  { key: "bridged", label: "Bridged" },
+  { key: "meme", label: "Meme" },
+];
 
 
 export default function BulkTransferApp() {
@@ -20,10 +27,15 @@ export default function BulkTransferApp() {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("");
   const [txHash, setTxHash] = useState<string>("");
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalCategory, setModalCategory] = useState(CATEGORIES[0].key);
+  const [modalTokens, setModalTokens] = useState<TokenResult[]>([]);
+  const [tokensLoading, setTokensLoading] = useState(false);
+  const [walletBalancesMap, setWalletBalancesMap] = useState<Record<string, string>>({});
+  const [selectedToken, setSelectedToken] = useState<TokenResult | null>(null);
 
   const { execute } = useBulkTransferWithApprove();
-  const { tokens, loading: tokensLoading } = useTokenBalances();
-  const { isConnected } = useAccount();
+  const { address: sender, isConnected } = useAccount();
 
   const validateAddress = (address: string): boolean => {
     try {
@@ -151,81 +163,198 @@ export default function BulkTransferApp() {
     return `${total || 0}`;
   };
 
-  const selectedToken = tokens.find(t => {
-    if (t.symbol === 'MON') {
-      return tokenAddress === 'native';
+  // Carrega mapa de saldos da wallet para exibir no modal
+  useEffect(() => {
+    (async () => {
+      if (!sender) {
+        setWalletBalancesMap({});
+        return;
+      }
+      try {
+        const balances = await getWalletBalances(sender);
+        const map: Record<string, string> = {};
+        for (const b of balances) {
+          map[b.address.toLowerCase()] = b.balance;
+        }
+        setWalletBalancesMap(map);
+      } catch (e) {
+        setWalletBalancesMap({});
+      }
+    })();
+  }, [sender]);
+
+  // Carrega tokens do modal quando abre
+  useEffect(() => {
+    if (!modalOpen) return;
+    setTokensLoading(true);
+    
+    // Categoria especial: My Wallet (mostra apenas tokens com saldo > 0)
+    if (modalCategory === "mywallet") {
+      if (!sender) {
+        setModalTokens([]);
+        setTokensLoading(false);
+        return;
+      }
+      (async () => {
+        try {
+          const balances: TokenBalance[] = await getWalletBalances(sender);
+          const withBalance = balances.filter(b => Number(b.balance) > 0);
+          const converted: TokenResult[] = withBalance.map(token => ({
+            address: token.address,
+            categories: token.categories,
+            decimals: token.decimals,
+            name: token.name,
+            symbol: token.symbol,
+            id: token.id || token.address,
+            balance: token.balance,
+          })).sort((a, b) => Number(b.balance || 0) - Number(a.balance || 0));
+          setModalTokens(converted);
+        } catch (error) {
+          console.error("Error fetching wallet balances for My Wallet:", error);
+          setModalTokens([]);
+        } finally {
+          setTokensLoading(false);
+        }
+      })();
+      return;
     }
-    return t.address === tokenAddress;
-  }) || null;
+    
+    // Para outras categorias, busca todos os tokens da categoria da API
+    getTokensByCategory(modalCategory)
+      .then((data) => {
+        setModalTokens(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching tokens by category:", error);
+        setModalTokens([]);
+      })
+      .finally(() => setTokensLoading(false));
+  }, [modalOpen, modalCategory, sender]);
+
+  // Atualiza categoria padrão conforme conexão da carteira
+  useEffect(() => {
+    if (sender) {
+      setModalCategory("mywallet");
+    } else {
+      setModalCategory("verified");
+    }
+  }, [sender]);
+
+  // Atualiza selectedToken quando tokenAddress muda
+  useEffect(() => {
+    if (!tokenAddress) {
+      setSelectedToken(null);
+      return;
+    }
+    
+    // Busca o token selecionado nos tokens do modal ou busca individualmente
+    const findToken = async () => {
+      if (tokenAddress === 'native') {
+        // Para native, busca o token MON
+        try {
+          // Primeiro tenta encontrar nos tokens da wallet
+          if (sender) {
+            const balances = await getWalletBalances(sender);
+            const monBalance = balances.find(b => b.symbol === 'MON');
+            if (monBalance) {
+              setSelectedToken({
+                address: monBalance.address,
+                categories: monBalance.categories,
+                decimals: monBalance.decimals,
+                name: monBalance.name,
+                symbol: monBalance.symbol,
+                id: monBalance.id || monBalance.address,
+                balance: monBalance.balance,
+              });
+              return;
+            }
+          }
+          // Se não encontrou na wallet, busca na API
+          const monTokens = await getTokensByCategory("verified");
+          const monToken = monTokens.find(t => t.symbol === 'MON');
+          if (monToken) {
+            setSelectedToken(monToken);
+          }
+        } catch (e) {
+          console.error("Error finding MON token:", e);
+        }
+      } else {
+        // Para outros tokens, primeiro verifica se está no modalTokens
+        const tokenInModal = modalTokens.find(t => t.address.toLowerCase() === tokenAddress.toLowerCase());
+        if (tokenInModal) {
+          setSelectedToken(tokenInModal);
+          return;
+        }
+        
+        // Se não está no modal, busca na lista de tokens disponíveis
+        try {
+          const allCategories = await Promise.all(
+            CATEGORIES.map(cat => getTokensByCategory(cat.key))
+          );
+          const allTokens = allCategories.flat();
+          const token = allTokens.find(t => t.address.toLowerCase() === tokenAddress.toLowerCase());
+          if (token) {
+            setSelectedToken(token);
+          }
+        } catch (e) {
+          console.error("Error finding token:", e);
+        }
+      }
+    };
+    
+    findToken();
+  }, [tokenAddress, sender, modalTokens]);
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-10">
       <h1 className="text-xl font-bold text-purple-400 mb-4">Bulk Transfer Tool</h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <label className="text-sm text-gray-400">Select token</label>
-        <Listbox
-          value={tokenAddress}
-          onChange={(value) => {
-            if (value === 'native') {
-              const monToken = tokens.find(t => t.symbol === 'MON');
-              if (monToken) {
-                setTokenAddress('native');
-                setDecimals(monToken.decimals);
-              }
-            } else {
-              const selected = tokens.find(t => t.address === value);
-              if (selected) {
-                setTokenAddress(selected.address);
-                setDecimals(selected.decimals);
-              } else {
-                setTokenAddress("");
-              }
-            }
-          }}
-          disabled={tokensLoading || loading}
+        <div 
+          className="flex items-center bg-zinc-800 rounded-lg px-3 py-2 cursor-pointer hover:bg-zinc-700 transition"
+          onClick={() => setModalOpen(true)}
         >
-          <div className="relative">
-            <Listbox.Button className="relative w-full cursor-pointer rounded bg-zinc-900 border border-zinc-700 py-2 pl-4 pr-10 text-left text-sm text-white">
-              <span className="block truncate">
-                {selectedToken
-                  ? `${selectedToken.symbol} – ${selectedToken.formattedBalance}`
-                  : (tokensLoading ? "Loading tokens..." : "-- Select a token --")}
-              </span>
-              <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                <ChevronUpDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
-              </span>
-            </Listbox.Button>
-            <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded bg-zinc-900 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-              {tokens.map((t) => {
-                const value = t.symbol === 'MON' ? 'native' : t.address;
-                return (
-                  <Listbox.Option
-                    key={value}
-                    value={value}
-                    className={({ active }) =>
-                      `relative cursor-pointer select-none py-2 pl-4 pr-10 ${
-                        active ? 'bg-purple-600 text-white' : 'text-white'
-                      }`
-                    }
-                  >
-                    {({ selected }) => (
-                      <>
-                        <span className={`block truncate ${selected ? 'font-bold' : 'font-normal'}`}>
-                          {t.symbol} – {t.formattedBalance}
-                        </span>
-                        {selected ? (
-                          <span className="absolute inset-y-0 right-0 flex items-center pr-3 text-white">
-                            <CheckIcon className="h-5 w-5" aria-hidden="true" />
-                          </span>
-                        ) : null}
-                      </>
-                    )}
-                  </Listbox.Option>
-                );
-              })}
-            </Listbox.Options>
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            <span className="font-bold text-white font-mono text-base">
+              {selectedToken?.symbol || "Select"}
+            </span>
+            <span className="text-xs text-violet-400 font-mono truncate max-w-[80px]">
+              {selectedToken?.name || ""}
+            </span>
           </div>
-        </Listbox>
+          {selectedToken && (() => {
+            const addressKey = selectedToken.address.toLowerCase();
+            const balance = walletBalancesMap[addressKey] || selectedToken.balance;
+            return balance ? (
+              <span className="text-xs text-violet-300 font-mono ml-2">
+                {balance}
+              </span>
+            ) : null;
+          })()}
+        </div>
+        
+        <TokenSelectModal
+          open={modalOpen}
+          onClose={() => setModalOpen(false)}
+          category={modalCategory}
+          setCategory={setModalCategory}
+          tokens={modalTokens}
+          loading={tokensLoading}
+          onSelect={(token) => {
+            // Se for MON, usa 'native', senão usa o endereço
+            if (token.symbol === 'MON') {
+              setTokenAddress('native');
+              setDecimals(Number(token.decimals));
+            } else {
+              setTokenAddress(token.address as `0x${string}`);
+              setDecimals(Number(token.decimals));
+            }
+            setSelectedToken(token);
+            setModalOpen(false);
+          }}
+          hasWallet={Boolean(sender)}
+          balances={walletBalancesMap}
+        />
 
         <label className="text-sm text-gray-400">Amount to send (same for all)</label>
         <input

@@ -8,9 +8,14 @@ import { X, Info, AlertCircle, CheckCircle, AlertTriangle } from "lucide-react";
 export interface BannerConfig {
   enabled: boolean;
   message: string;
-  type?: "info" | "warning" | "success" | "error";
+  type?: "info" | "warning" | "success" | "error" | "custom";
   dismissible?: boolean;
   hideOnScroll?: boolean;
+  customColor?: {
+    bg?: string;
+    border?: string;
+    text?: string;
+  };
   action?: {
     label: string;
     onClick: () => void;
@@ -90,7 +95,15 @@ export const StickyBanner = ({
   if (config && !dismissed) {
     if (!config.enabled) return null;
 
-    const styles = bannerTypeStyles[config.type || "info"];
+    const isCustom = config.type === "custom";
+    const styles = isCustom
+      ? {
+          bg: config.customColor?.bg || "bg-gray-500/20",
+          border: config.customColor?.border || "border-gray-500/30",
+          text: config.customColor?.text || "text-gray-200",
+          icon: Info,
+        }
+      : bannerTypeStyles[(config.type || "info") as keyof typeof bannerTypeStyles];
     const Icon = styles.icon;
 
     return (

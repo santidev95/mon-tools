@@ -99,6 +99,27 @@ export const bannerConfig: BannerConfig = {
 };
 ```
 
+### Exemplo 8: Banner Personalizado com Cores Customizadas
+
+```typescript
+export const bannerConfig: BannerConfig = {
+  enabled: true,
+  message: "🎨 Banner personalizado com cores únicas!",
+  type: "custom",
+  dismissible: true,
+  customColor: {
+    bg: "bg-purple-500/20",      // Cor de fundo (com opacidade)
+    border: "border-purple-500/30", // Cor da borda (com opacidade)
+    text: "text-purple-200",     // Cor do texto
+  },
+};
+```
+
+**Nota sobre cores customizadas:**
+- Use classes Tailwind CSS para as cores
+- Recomenda-se usar opacidade (`/20` para bg, `/30` para border) para melhor legibilidade
+- Exemplos de cores: `purple-500/20`, `pink-500/20`, `indigo-500/20`, `cyan-500/20`, etc.
+
 ## 🎨 Tipos de Banner Disponíveis
 
 | Tipo | Cor | Icone | Uso |
@@ -107,14 +128,19 @@ export const bannerConfig: BannerConfig = {
 | `warning` | Amarelo | ⚠️ | Avisos importantes |
 | `success` | Verde | ✅ | Mensagens de sucesso |
 | `error` | Vermelho | 🚨 | Erros ou problemas |
+| `custom` | Personalizada | ℹ️ | Banner com cores customizadas |
 
 ## ⚙️ Propriedades do Banner
 
 - **`enabled`**: `boolean` - Ativa/desativa o banner
 - **`message`**: `string` - Texto a ser exibido no banner
-- **`type`**: `"info" | "warning" | "success" | "error"` - Tipo do banner
+- **`type`**: `"info" | "warning" | "success" | "error" | "custom"` - Tipo do banner
 - **`dismissible`**: `boolean` - Se `false`, o usuário não pode fechar
 - **`hideOnScroll`**: `boolean` - Se `true`, esconde quando o usuário rola
+- **`customColor`**: `object` (opcional) - Cores personalizadas quando `type: "custom"`
+  - `bg`: Cor de fundo (ex: `"bg-purple-500/20"`)
+  - `border`: Cor da borda (ex: `"border-purple-500/30"`)
+  - `text`: Cor do texto (ex: `"text-purple-200"`)
 - **`action`**: `object` (opcional) - Adiciona um botão clicável
   - `label`: Texto do botão
   - `onClick`: Função a ser executada

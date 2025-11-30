@@ -11,11 +11,12 @@ import { BannerConfig } from "@/components/ui/Banner";
  * - warning: Avisos importantes (amarelo)
  * - success: Mensagens de sucesso (verde)
  * - error: Erros ou problemas (vermelho)
+ * - custom: Banner personalizado com cores customizadas (requer customColor)
  */
 export const bannerConfig: BannerConfig = {
-  enabled: false, // Banner habilitado
-  message: "Our platform is currently experiencing issues when performing token swaps. We are working to fix it as soon as possible.",
-  type: "warning", // info | warning | success | error
+  enabled: true, // Banner habilitado
+  message: "MonTools is live on the Monad Mainnet!",
+  type: "custom", // info | warning | success | error | custom
   dismissible: false, // Se false, o usuário não poderá fechar o banner
   hideOnScroll: false, // Se true, o banner esconde ao rolar a página
   
@@ -25,6 +26,13 @@ export const bannerConfig: BannerConfig = {
   //   onClick: () => {
   //     window.open("https://example.com", "_blank");
   //   },
+  // },
+  
+  // Opcional: Cores personalizadas (usado quando type: "custom")
+  // customColor: {
+  //   bg: "bg-purple-500/20",      // Cor de fundo com opacidade
+  //   border: "border-purple-500/30", // Cor da borda com opacidade
+  //   text: "text-purple-200",     // Cor do texto
   // },
 };
 
