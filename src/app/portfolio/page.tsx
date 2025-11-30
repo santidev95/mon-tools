@@ -5,7 +5,7 @@ import { usePublicClient, useAccount } from 'wagmi'
 import { Loader2 } from "lucide-react";
 import dynamic from "next/dynamic";
 import { getWalletBalances, TokenBalance } from "../../lib/clients/monorail/dataApi";
-import { fetchUserTokens, MagicEdenToken } from "@/lib/clients/magicEdenClient";
+import { fetchUserTokens, UserCollectionV4 } from "@/lib/clients/magicEdenClient";
 
 // Dynamically import heavy components with named exports
 const SummaryCard = dynamic(() => import("./components/SummaryCard").then(mod => ({ default: mod.SummaryCard })), {
@@ -39,10 +39,7 @@ export default function PortfolioPage() {
     const [memeBalances, setMemeBalances] = useState<TokenBalance[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [selectedMenu, setSelectedMenu] = useState<string>("Summary");
-    const [nfts, setNfts] = useState<MagicEdenToken[] | null>(null);
-    const [continuation, setContinuation] = useState<string | null>(null);
-    const [loadingMore, setLoadingMore] = useState<boolean>(false);
-    const [loadMoreElement, setLoadMoreElement] = useState<HTMLDivElement | null>(null);
+    const [collections, setCollections] = useState<UserCollectionV4[] | null>(null);
 
 
 
@@ -78,11 +75,9 @@ export default function PortfolioPage() {
             if (address) {
                 const result = await fetchUserTokens(address);
                 if (result) {
-                    setNfts(result.tokens);
-                    setContinuation(result.continuation);
+                    setCollections(result.collections);
                 } else {
-                    setNfts([]);
-                    setContinuation(null);
+                    setCollections([]);
                 }
             }
         };
@@ -90,54 +85,6 @@ export default function PortfolioPage() {
         fetchNFTs();
     }, [address]);
 
-    // Reset loading state when switching away from NFTs menu
-    useEffect(() => {
-        if (selectedMenu !== "NFTs") {
-            setLoadingMore(false);
-        }
-    }, [selectedMenu]);
-
-    useEffect(() => {
-        // Only setup observer when we're on NFTs tab and have element
-        if (selectedMenu !== "NFTs" || !loadMoreElement) {
-            return;
-        }
-
-        let isLoading = false; // Local loading state to prevent race conditions
-
-        const observer = new IntersectionObserver(
-            async (entries) => {
-                const target = entries[0];
-                
-                if (target.isIntersecting && continuation && !isLoading && selectedMenu === "NFTs" && address) {
-                    isLoading = true;
-                    setLoadingMore(true);
-                    try {
-                        const result = await fetchUserTokens(address, 20, continuation);
-                        if (result) {
-                            setNfts(prev => prev ? [...prev, ...result.tokens] : result.tokens);
-                            setContinuation(result.continuation);
-                        }
-                    } catch (error) {
-                        console.error('Error loading more NFTs:', error);
-                    } finally {
-                        isLoading = false;
-                        setLoadingMore(false);
-                    }
-                }
-            },
-            { 
-                threshold: 0.1,
-                rootMargin: '50px'
-            }
-        );
-
-        observer.observe(loadMoreElement);
-
-        return () => {
-            observer.unobserve(loadMoreElement);
-        };
-    }, [selectedMenu, continuation, loadMoreElement, address]); // Remove loadingMore from dependencies
 
     if (!address) {
         return (
@@ -202,10 +149,7 @@ export default function PortfolioPage() {
                     )}
                     {selectedMenu === "NFTs" && (
                         <NFTsCard
-                            nfts={nfts}
-                            continuation={continuation}
-                            loadingMore={loadingMore}
-                            onLoadMoreRefReady={setLoadMoreElement}
+                            collections={collections}
                         />
                     )}
                     {selectedMenu === "Domains" && (

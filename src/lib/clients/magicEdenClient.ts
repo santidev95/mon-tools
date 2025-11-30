@@ -173,6 +173,45 @@ export interface UserTokensResponse {
   continuation: string | null;
 }
 
+export interface UserCollectionV4 {
+  id: string;
+  chain: string;
+  name: string;
+  symbol: string;
+  description?: string;
+  media?: {
+    url?: string;
+  };
+  social?: {
+    twitterUsername?: string;
+    discordUrl?: string;
+    websiteUrl?: string;
+  };
+  verification?: string;
+  isTradeable?: boolean;
+  royalty?: {
+    recipient?: string;
+    bps?: number;
+    isOptional?: boolean;
+  };
+  collectionType?: string;
+  isSeaportV16Disabled?: boolean;
+  isSeaportV16RoyaltyOptional?: boolean;
+  seaportV16ListingCurrencies?: any[];
+  chainData?: {
+    contract?: string;
+    transferability?: string;
+    collectionBidSupported?: boolean;
+    isMinting?: boolean;
+  };
+  ownedCount: number;
+  listedCount: number;
+}
+
+export interface UserCollectionsResponse {
+  collections: UserCollectionV4[];
+}
+
 export async function fetchMagicEdenCollection(contract: string): Promise<MagicEdenCollection | null> {
   const url = `${API_URL}?contract=${contract}&includeMintStages=true&includeSecurityConfigs=true`;
 
@@ -229,25 +268,18 @@ export async function fetchUserCollectionByContract(
 }
 
 /**
- * Fetches tokens owned by a wallet with pagination support.
+ * Fetches collections owned by a wallet.
  * @param wallet Wallet address
- * @param limit Number of tokens to fetch (default: 1)
- * @param continuation Continuation token for pagination
- * @returns List of tokens and continuation token
+ * @returns List of collections
  */
 export async function fetchUserTokens(
   wallet: string,
-  limit: number = 20,
+  limit?: number,
   continuation?: string
-): Promise<UserTokensResponse | null> {
+): Promise<UserCollectionsResponse | null> {
   const params = new URLSearchParams({
     wallet,
-    limit: limit.toString(),
   });
-
-  if (continuation) {
-    params.append("continuation", continuation);
-  }
 
   const url = `/api/magiceden/user-tokens?${params.toString()}`;
 
@@ -255,13 +287,13 @@ export async function fetchUserTokens(
     const response = await fetch(url);
 
     if (!response.ok) {
-      console.warn("Magic Eden user tokens API error:", response.status);
+      console.warn("Magic Eden user collections API error:", response.status);
       return null;
     }
 
     return response.json();
   } catch (error) {
-    console.error("Error fetching user tokens:", error);
+    console.error("Error fetching user collections:", error);
     return null;
   }
 }

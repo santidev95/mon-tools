@@ -1,44 +1,28 @@
 import { NextResponse } from "next/server";
 
-const API_URL = "https://api-mainnet.magiceden.dev/v3/rtp/monad-testnet/users";
+const API_URL = "https://api-mainnet.magiceden.dev/v4/evm-public/collections/user-collections";
 const API_KEY = "d79f52a1-1a8c-42a0-9d6b-7afaf5a6e54c";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const wallet = searchParams.get("wallet");
-  const limit = searchParams.get("limit") || "20";
-  const continuation = searchParams.get("continuation");
 
   if (!wallet) {
     return NextResponse.json({ error: "Wallet address is required" }, { status: 400 });
   }
 
-  const params = new URLSearchParams({
-    normalizeRoyalties: "false",
-    sortBy: "acquiredAt",
-    sortDirection: "desc",
-    limit,
-    includeTopBid: "false",
-    includeAttributes: "false",
-    includeLastSale: "false",
-    includeRawData: "false",
-    filterSpamTokens: "true",
-    useNonFlaggedFloorAsk: "false",
-  });
-
-  if (continuation) {
-    params.append("continuation", continuation);
-  }
-
-  const url = `${API_URL}/${wallet}/tokens/v7?${params.toString()}`;
-
   try {
-    const response = await fetch(url, {
-      method: "GET",
+    const response = await fetch(API_URL, {
+      method: "POST",
       headers: {
         Accept: "*/*",
+        "Content-Type": "application/json",
         Authorization: `Bearer ${API_KEY}`,
       },
+      body: JSON.stringify({
+        walletAddresses: [wallet],
+        chain: "monad",
+      }),
     });
 
     if (!response.ok) {
